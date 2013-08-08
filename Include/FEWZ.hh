@@ -15,9 +15,13 @@
 
 #ifdef _8TeV_analysis_
 // 8 TeV FEWZ map is based on file from Alexey
-const int _nMassBinsFEWZ_8TeV = 14;
+const int _nMassBinsFEWZ_8TeV = 40;
 const double _massBinLimitsFEWZ_8TeV[_nMassBinsFEWZ_8TeV + 1] = 
-  { 15, 20, 30, 45, 60, 72, 106, 120, 133, 150, 160, 171, 200, 400, 1500 };
+  {  15,  20,  25,  30,  35,  40,  45,  50,  55,  60, 
+     64,  68,  72,  76,  81,  86,  91,  96, 101, 106, 
+    110, 115, 120, 126, 133, 141, 150, 160, 171, 185,
+    200, 220, 243, 273, 320, 380, 440, 510, 600,1000,
+   1500 };
 const int _nMassBinsFEWZ = _nMassBinsFEWZ_8TeV;
 const double *_massBinLimitsFEWZ = _massBinLimitsFEWZ_8TeV;
 #else
@@ -32,10 +36,13 @@ const double _massBinLimitsFEWZ[_nMassBinsFEWZ+1] =
 
 
 #ifdef _8TeV_analysis_
-const int nptbins_FEWZ8TeV = 21;
-const int nrapbins_FEWZ8TeV = 8;
-const double pt_bin_FEWZ8TeV[nptbins_FEWZ8TeV] = {0.0,20.0,30.,35.,40.,45.,50.,55.,60.,65.,70.,75.,80.,85.,90.,100.,120.,150.,300.,600.,1000.};
-const double rap_bin_FEWZ8TeV[nrapbins_FEWZ8TeV] = {0.,0.2,0.4,0.7,1.1,1.9,2.4,1000.0};
+// In ver.2 These are the edges where at least one map changes
+const int nptbins_FEWZ8TeV = 12;
+const int nrapbins_FEWZ8TeV = 6;
+const double pt_bin_FEWZ8TeV[nptbins_FEWZ8TeV] = {
+  0.,  20.,  30.,  35.,  40.,  45.,  50.,  60.,  90., 100.,
+  200.,1000.};
+const double rap_bin_FEWZ8TeV[nrapbins_FEWZ8TeV] = {0.,0.7,1.1,1.9,2.4,1000.0};
 #endif
 
 
