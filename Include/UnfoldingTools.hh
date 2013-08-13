@@ -1,5 +1,5 @@
-#ifndef UnfoldingTools
-#define UnfoldingTools
+#ifndef UnfoldingTools_HH
+#define UnfoldingTools_HH
 
 #include <TString.h>
 #include <TVectorD.h>
