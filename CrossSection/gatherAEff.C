@@ -4,6 +4,7 @@
 #include <fstream>
 #include "../Include/DYTools.hh"
 #include "../Include/MyTools.hh"
+#include "../Include/UnfoldingTools.hh"
 
 typedef TH1F Histo_t; // match the type returned in MyTools.hh
 
@@ -142,8 +143,16 @@ void gatherAEff(const char *inpFile=NULL) {
   if (DYTools::study2D) {
     outFName="dyee_aeff_2D.root";
     TFile fout(outFName,"recreate");
+    accM.Write("acceptance");
+    accErrM.Write("acceptanceErr");
+    effM.Write("efficiency");
+    effErrM.Write("efficiencyErr");
+    rhoM.Write("scaleFactor");
+    rhoErrM.Write("scaleFactorErr");
+    unfolding::writeBinningArrays(fout);
+
     for (int i=0; i<DYTools::nMassBins; ++i) {
-      TString massRange=Form("_%2.0lf_%2.0lf",DYTools::massBinLimits[i],DYTools::massBinLimits[i+1]);
+      TString massRange=Form("_%1.0lf_%2.0lf",DYTools::massBinLimits[i],DYTools::massBinLimits[i+1]);
       TString hAccName=TString("hAcc") + massRange;
       Histo_t *hAcc=extractRapidityDependence(hAccName,"",accM,accErrM,i,0);
       TString hEffName=TString("hEff") + massRange;
@@ -187,6 +196,8 @@ void gatherAEff(const char *inpFile=NULL) {
       effErr.Write("efficiencyErr");
       rho.Write("scaleFactor");
       rhoErr.Write("scaleFactorErr");
+      unfolding::writeBinningArrays(fout);
+
       hAcc->Write();
       hEff->Write();
       hRho->Write();
