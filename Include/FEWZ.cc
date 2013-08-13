@@ -101,7 +101,7 @@ int FEWZ_t::prepareHisto_8TeV(Int_t mass_bin, int abs_rapidity) {
 // A macro from Alexey Svyatkovskiy <asvyatko@purdue.edu> providing
 // FEWZ NNLO/NLO correction weight maps (August 08, 2013)
 
-
+inline
 int Find_Index1( double muon_input, bool isPt )
 {
 
@@ -132,6 +132,7 @@ int Find_Index1( double muon_input, bool isPt )
   }
 }
 
+inline
 int Find_Index2( double muon_input, bool isPt )
 {
 
@@ -162,6 +163,7 @@ int Find_Index2( double muon_input, bool isPt )
   }
 }
 
+inline
 int Find_Index3( double muon_input, bool isPt )
 {
 
