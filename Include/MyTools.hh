@@ -10,8 +10,11 @@
 #include "TVectorD.h"
 #include <iostream>
 #include <math.h>
+#include <string>
 #include "../Include/CPlot.hh"
 #include "../Include/DYTools.hh"
+
+const std::string dashline=std::string(65,'-') + std::string("\n");
 
 //#include "RooStats/FeldmanCousins.h"
 
@@ -127,6 +130,19 @@ void PrintVec(const char *msg, const std::vector<T>& vec, int prneol=0) {
 
 //------------------------------------------------------------------------------------------------------------------------
 
+template<class T>
+inline void PrintVVecCounts(const char *msg, const std::vector<std::vector<T>*> &arr) {
+  if (msg) std::cout << msg;
+  std::cout << " vec[" << arr.size() << "] of vecs sizes: ";
+  for (unsigned int i=0; i<arr.size(); ++i) {
+    std::cout << " " << arr[i]->size();
+  }
+  std::cout << "\n";
+  return;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
 inline
 void SaveCanvas(TCanvas* canv, const TString &canvName, TString destDir=CPlot::sOutDir) 
 {
@@ -167,6 +183,40 @@ template<class Type_t>
 inline
 void HERE(const char *format, const Type_t &a) {
   std::cout << Form(format,a) << std::endl;
+}
+
+//--------------------------------------------------------------
+
+template<class Type1_t, class Type2_t>
+inline
+void HERE(const char *format, const Type1_t &a, const Type2_t &b) {
+  std::cout << Form(format,a,b) << std::endl;
+}
+
+//--------------------------------------------------------------
+
+inline
+void HERE(const char *format, const TString &a) {
+  const char *aStr=(a.Length()) ? a.Data() : " ";
+  std::cout << Form(format,aStr) << std::endl;
+}
+//--------------------------------------------------------------
+
+inline
+void HERE(const char *format, const TString &a, const TString &b) {
+  const char *aStr=(a.Length()) ? a.Data() : " ";
+  const char *bStr=(b.Length()) ? b.Data() : " ";
+  std::cout << Form(format,aStr,bStr) << std::endl;
+}
+
+//--------------------------------------------------------------
+
+template<class Type_t>
+inline
+void HERE(const char *format, const TString &a, const TString &b, const Type_t &x ) {
+  const char *aStr=(a.Length()) ? a.Data() : " ";
+  const char *bStr=(b.Length()) ? b.Data() : " ";
+  std::cout << Form(format,aStr,bStr,x) << std::endl;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -379,7 +429,7 @@ inline void printCSMatrixValues(const TString &name, const TMatrixD &cs, const T
 
 inline void printProgress(const char *msg, int idx, int idxMax) {
   double r=trunc(idx/double(idxMax)*1000)*0.1;
-  std::cout << msg << idx << "/" << idxMax << " (" << r << "%)\n";
+  std::cout << msg << idx << "/" << idxMax << " (" << r << "%)" << std::endl;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -389,30 +439,39 @@ void printSanityCheck(const TMatrixD &val, const TMatrixD &err, const TString &n
 {
   using namespace DYTools;
   std::cout<<"Sanity check printout"<<std::endl;
-  if (val.GetNrows()!=nMassBins || val.GetNcols()!=findMaxYBins())
+  if (val.GetNrows()!=nMassBins || val.GetNcols()!=nYBinsMax)
     {
-      std::cout<<name<<" matrix has wrong size"<<std::cout;
+      std::cout<<name<<" matrix has wrong size"<<std::endl;
       return;
     }
-  if (err.GetNrows()!=nMassBins || err.GetNcols()!=findMaxYBins())
+  if (err.GetNrows()!=nMassBins || err.GetNcols()!=nYBinsMax)
     {
-      std::cout<<name<<"Err matrix has wrong size"<<std::cout;
+      std::cout<<name<<"Err matrix has wrong size"<<std::endl;
       return;
     }
+  int err_found=0;
   std::cout<<"Nan values of "<<name<<" or/and "<<name<<"Err:"<<std::endl;
   for(int i=0; i<DYTools::nMassBins; i++)
     for (int yi=0; yi<nYBins[i]; ++yi) 
       {
-        if ( (val(i,yi)!=val(i,yi)) || (err(i,yi)!=err(i,yi)) )
-           std::cout<<name<<"("<<i<<","<<yi<<")="<<val(i,yi)<<", "<<name<<"Err("<<i<<","<<yi<<")="<<err(i,yi)<<std::endl;
+        if ( (val(i,yi)!=val(i,yi)) || (err(i,yi)!=err(i,yi)) ) {
+	  err_found=1;
+	  std::cout<<"  "<<name<<"("<<i<<","<<yi<<")="<<val(i,yi)<<", "<<name<<"Err("<<i<<","<<yi<<")="<<err(i,yi)<<std::endl;
+	}
       }
+  if (!err_found) std::cout << "  did not find any\n";
   std::cout<<"Large errors ("<<name<<"Errv>0.1*"<<name<<" or "<<name<<"Err>0.1) :"<<std::endl;
+  err_found=0;
   for(int i=0; i<DYTools::nMassBins; i++)
     for (int yi=0; yi<nYBins[i]; ++yi) 
       {
-        if ( fabs(err(i,yi))>0.1*fabs(val(i,yi)) || fabs(err(i,yi))>0.1)
-           std::cout<<name<<"("<<i<<","<<yi<<")="<<val(i,yi)<<", "<<name<<"Err("<<i<<","<<yi<<")="<<err(i,yi)<<std::endl;
+        if ( fabs(err(i,yi))>0.1*fabs(val(i,yi)) || fabs(err(i,yi))>0.1) {
+	  std::cout<<"  "<<name<<"("<<i<<","<<yi<<")="<<val(i,yi)<<", "<<name<<"Err("<<i<<","<<yi<<")="<<err(i,yi)<<std::endl;
+	   err_found=1;
+	}
       }
+  if (!err_found) std::cout << "  did not find any\n";
+  return;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
