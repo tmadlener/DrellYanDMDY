@@ -15,11 +15,16 @@ void     SetStyle     ();
 
 
 inline
-void AdjustFor2DplotWithHeight(TCanvas *c) {
-  for (int i=0; i<50; i++) {
+void AdjustFor2DplotWithHeight(TCanvas *c, double rmargin=0.18) {
+  int count=0;
+  for (int i=0; i<100; i++) {
     TPad *pad=(TPad*)c->GetPad(i);
-    if (pad) pad->SetRightMargin(1.5);
+    if (pad) {
+      count++;
+      pad->SetRightMargin(rmargin);
+    }
   }
+  if (count==1) c->SetRightMargin(rmargin);
 }
 
 #endif
