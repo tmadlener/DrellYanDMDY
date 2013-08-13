@@ -254,6 +254,7 @@ void plotDYEfficiency(const TString input,
 
     for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
       if (debugMode && (ientry>10000)) break;
+      if (ientry%1000000==0) printProgress("ientry=",ientry,eventTree->GetEntriesFast());
       //if (ientry>100) break;
       genBr->GetEntry(ientry);
       infoBr->GetEntry(ientry);
