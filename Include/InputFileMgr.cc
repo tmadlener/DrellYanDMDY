@@ -255,6 +255,13 @@ int MCInputFileMgr_t::Load(const TString& inputFileName) {
       FDirTag = TString(line);
       getline(ifs,line);
       stringstream ss3(line); ss3 >> FEScaleTag;
+      if (FEScaleTag.Contains("specTag=")) {
+	Ssiz_t pos=FEScaleTag.Index("=");
+	FSpecTag=FEScaleTag(pos+1,FEScaleTag.Length());
+	std::cout << "FSpecTag=<" << FSpecTag << ">\n";
+	getline(ifs,line);
+	stringstream ss4(line); ss4 >> FEScaleTag;
+      }
       state++;
       continue;
     }else{
