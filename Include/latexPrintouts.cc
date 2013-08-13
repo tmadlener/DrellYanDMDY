@@ -96,7 +96,7 @@ void latexPrintoutBackgroundRates2D(TMatrixD observedYields, TMatrixD observedYi
                                     TMatrixD totalBackgroundErrorSyst, TMatrixD bkgRatesUsual, 
                                     TString producedBy)
 {
-   int nValues=3;
+   const int nValues=3;
    TMatrixD* values[nValues];   values[0]=&observedYields; 
    values[1]=&totalBackground; values[2]=&bkgRatesUsual;
    int valuesType[nValues];   valuesType[0]=1;
