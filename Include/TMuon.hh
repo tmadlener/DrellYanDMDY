@@ -38,6 +38,11 @@ namespace mithep
       Float_t neuHadIso_02_03;
       Float_t neuHadIso_03_04;
       Float_t neuHadIso_04_05;
+      Float_t puIso_00_01;            // Particle Flow isolation contributions from Pile-Up
+      Float_t puIso_01_02;
+      Float_t puIso_02_03;
+      Float_t puIso_03_04;
+      Float_t puIso_04_05;
       Float_t pfPt, pfEta, pfPhi;     // Matching Particle Flow candidate kinematics
       Float_t d0, dz;                 // impact parameter
       Float_t tkNchi2;	              // track chi^2/ndf 
@@ -55,7 +60,7 @@ namespace mithep
       UInt_t  trkID;                  // tracker track ID
       ULong_t hltMatchBits;           // bits for matching with HLT primitives 
 
-    ClassDef(TMuon,2)
+    ClassDef(TMuon,3)
   };  
 }
 #endif
