@@ -687,7 +687,7 @@ void eff_IdHlt(const TString configFile, const TString effTypeString,
 	    }
 	  }
 	}else{
-	  storeNGoodPV = info->nPU;
+	  storeNGoodPV = info->nPUmean;
 	}
 	
 	storeMass = dielectron->mass;

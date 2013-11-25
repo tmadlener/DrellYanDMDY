@@ -747,9 +747,9 @@ void selectEvents(const TString conf,
 	  // fill ntuple data
 	  double weightSave = weight;
 	  eem->weight(weight);
-	  /// adaptation to Hildreth's method: save info->nPU
+	  /// adaptation to Hildreth's method: save info->nPUmean
 	  //eem->nGoodPV(nGoodPV);
-	  eem->nGoodPV(info->nPU);
+	  eem->nGoodPV(info->nPUmean);
 
 	  if( snamev[isam] == "zee" ) {
 	    weightSave *= fewz_weight;
@@ -763,7 +763,7 @@ void selectEvents(const TString conf,
 	  // Hildreth scheme, we need the simulation level number of PU interactions.
 	  int totalPV = pvArr->GetEntriesFast();
 	  if( !isData )
-	    totalPV = info->nPU;
+	    totalPV = info->nPUmean;
 	  fillData(data, info, dielectron, totalPV, nGoodPV, njets, weightSave);
 	  outTree->Fill();
 	  if (eemTree) {

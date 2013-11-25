@@ -67,8 +67,9 @@ int PUReweight_t::initializeHildrethWeights(){
   // on the MC production, i.e. on the pile-up scenario (such as "S6" or S7"),
   // and on the vintage (Fall11, or Summer12).
   //     To prepare it with Drell-Yan ntuples, one needs to simply take
-  // any MC sample and plot the "Info.nPU" variable which, for MC, contains
-  // the number of simulated pile-up at generator level. The binning *has* to be
+  // any MC sample and plot the "Info.nPUmean" variable which, for MC, contains
+  // the number of simulated ("true", not "observed") pile-up at generator level. 
+  // The binning *has* to be
   // the same as that of the target distribution. Note: the comment
   // in the TEventInfo.hh header says it is "reconstructed vertices", but
   // it is a misinformation, according to the author Kevin Sung, it is really
@@ -76,7 +77,10 @@ int PUReweight_t::initializeHildrethWeights(){
 
   TString ftargetName = "../root_files/pileup/dataPileupHildreth_full2011_20121110_repacked.root";
   if( DYTools::energy8TeV == 1 ){
-    ftargetName = "../root_files/pileup/8TeV/dataPileupHildreth_full2012_20130521_repacked.root";
+    // The file below is based on the "generated" or "observed" PU
+    //ftargetName = "../root_files/pileup/8TeV/dataPileupHildreth_full2012_20130521_repacked.root";
+    // The file belos is based on the "true" or "mean" PU
+    ftargetName = "../root_files/pileup/8TeV/dataPileupHildreth_mean_full2012_20131106_repacked.root";
   }
   TFile f1(ftargetName);
   if( ! f1.IsOpen()){
@@ -95,7 +99,10 @@ int PUReweight_t::initializeHildrethWeights(){
 
   TString fsourceName = "../root_files/pileup/mcPileupHildreth_full2011_20121110_repacked.root";
   if( DYTools::energy8TeV == 1 ){
-    fsourceName = "../root_files/pileup/8TeV/mcPileupHildreth_full2012_20130521_repacked.root";
+    // The file below is based on the "generated" or "observed" PU
+    // fsourceName = "../root_files/pileup/8TeV/mcPileupHildreth_full2012_20130521_repacked.root";
+    // The file belos is based on the "true" or "mean" PU
+    fsourceName = "../root_files/pileup/8TeV/mcPileupHildreth_mean_full2012_20131106_repacked.root";
   }
   TFile f2(fsourceName);
   if( ! f2.IsOpen()){

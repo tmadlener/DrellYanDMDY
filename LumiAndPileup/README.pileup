@@ -178,7 +178,7 @@ have to be repeated as well. With the two new sets of distributions
 for pile-up reweighting, the analysis needs to be repeated.
 
 ------------------------------------------
-  8 TeV pile-up
+  8 TeV pile-up EARLY VERSION (see below for later version)
 ------------------------------------------
 
 The procedure described above remains the same.
@@ -222,3 +222,75 @@ As of this writing, we are using not the "mean"/"true" value of pile-up
 but the "observed"/"generated" number. (Notice, elgl, the "observed" calcMode
 above in pileupCalc.py command line, and nPU in the ntuples is the "generated" number). 
 The difference is explained in the  twiki with instructions about how to do it.
+
+------------------------------------------
+  8 TeV pile-up LATER (2d) VERSION
+------------------------------------------
+
+The procedure described above remains the same as the earlier
+8 TeV version above, only now we use the "true" (a.k.a. "mean")
+pile-up counts instead of "observed (a.k.a. "generated"). This
+is to agree with what other measurements are doing. See specifics
+in the CMS twiki docs that explain usage of pileupCalc.py.
+
+Specific steps:
+
+Some 8 TeV specific inputs:
+
+pick up the following file from lxplus:
+
+   /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/PileUp/pileup_JSON_DCSONLY_190389-208686_corr.txt
+
+Go to your release with CMSSW and RecoLuminosity/LumiDB
+of the right version, set up cmsenv.
+
+Command that prepares pile-up distribution for data
+(note that JSON here is the exact JSON for the data we are using)
+
+
+pileupCalc.py -i Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt \
+                      --inputLumiJSON pileup_JSON_DCSONLY_190389-208686_corr.txt \
+                      --calcMode observed --minBiasXsec 69400 --maxPileupBin 50 \
+                      --numPileupBins 50  MyDataPileupHistogram.root
+
+Run it two more times with inelastic cross section +5% and -5% for later systematics
+studies.
+
+pileupCalc.py -i Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt \
+                      --inputLumiJSON pileup_JSON_DCSONLY_190389-208686_corr.txt \
+                      --calcMode observed --minBiasXsec 72870 --maxPileupBin 50 \
+                      --numPileupBins 50  MyDataPileupHistogram_xsup.root
+
+pileupCalc.py -i Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt \
+                      --inputLumiJSON pileup_JSON_DCSONLY_190389-208686_corr.txt \
+                      --calcMode observed --minBiasXsec 65930 --maxPileupBin 50 \
+                      --numPileupBins 50  MyDataPileupHistogram_xsdown.root
+
+
+Copy the resulting 3 root files into something like DrellYanDMDY/root_files/pileup/8TeV/tmp/
+
+Next, put together the MC histogram from the primary signal MC sample, use
+the script from LumiAndPileup/ directory:
+(check that the used file name for MC input is the right one in the code)
+
+   .L prepareMCPileupReference.C+
+   prepareMCPileupReference()
+
+
+Next, change the hists prepared above into the format expected by our
+package for reweighting procedure. Execute our script from LumiAndPileup/ directory:
+(check just in case file names, maybe change timestamp in the in/out file names
+as needed):
+ 
+   .L repackPileup.C+
+   repackPileup(GENERAL_DATA_8TEV_MEAN);
+   repackPileup(GENERAL_DATA_8TEV_MEAN, PLUS_5_PERCENT);
+   repackPileup(GENERAL_DATA_8TEV_MEAN, MINUS_5_PERCENT);
+
+   repackPileup(GENERAL_MC_8TEV_MEAN);
+
+Do a final check of the presence of the pile-up files in the right directory,
+commit them to the code repository, and change the code where needed to pick 
+them up (currently it is Include/PUReweight.cc).
+
+

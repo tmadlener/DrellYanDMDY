@@ -3,6 +3,9 @@ A brief summary of which scripts do what in this directory:
 repackPileup.C, combineTwoPileups.C: these are used in preparing
       reference histograms for pile-up reweighting. See README.pileup.
 
+prepareMCPileupReference.C: used to prepare the primary reference
+     histogram of PU in MC. See README.pileup for usage.
+
 drawHildreth.C: a script to draw the primary data and MC histograms
       used to derive PU weights
 

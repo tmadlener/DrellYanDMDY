@@ -19,7 +19,9 @@ enum SAMPLE {
   TNP_ID       = 3,
   TNP_HLT      = 4,
   GENERAL_DATA_8TEV = 5,
-  GENERAL_MC_8TEV = 6
+  GENERAL_MC_8TEV = 6,
+  GENERAL_DATA_8TEV_MEAN = 7,
+  GENERAL_MC_8TEV_MEAN = 8
 };
 
 enum SYSTEMATICS {
@@ -31,7 +33,9 @@ enum SYSTEMATICS {
 void repackPileup(int sample, int systematics_flag = DEFAULT){
 
   bool is8TeV = false;
-  if( sample == GENERAL_DATA_8TEV || sample == GENERAL_MC_8TEV ){
+  if( sample == GENERAL_DATA_8TEV || sample == GENERAL_MC_8TEV ||
+      sample == GENERAL_DATA_8TEV_MEAN || sample == GENERAL_MC_8TEV_MEAN 
+      ){
     is8TeV = true;
   }
 
@@ -41,7 +45,7 @@ void repackPileup(int sample, int systematics_flag = DEFAULT){
   int nbinsExpected = 50;
   double lowEdgeExpected = 0;
   double upEdgeExpected = 50;
-  if( is8TeV ){
+  if( is8TeV && ! (sample == GENERAL_DATA_8TEV_MEAN)  ){
     nbinsExpected = 100;
     lowEdgeExpected = 0;
     upEdgeExpected = 100;
@@ -88,6 +92,14 @@ void repackPileup(int sample, int systematics_flag = DEFAULT){
   }else if( sample == GENERAL_MC_8TEV ){
     fname    = "../root_files/pileup/8TeV/mcPileupHildreth_full2012_20130521";
     fnameNew = "../root_files/pileup/8TeV/mcPileupHildreth_full2012_20130521_repacked";
+    outputHistName = "pileup_simulevel_mc";
+  }else if( sample == GENERAL_DATA_8TEV_MEAN ){
+    fname    = "../root_files/pileup/tmp/dataPileupHildreth_mean_full2012_20131106";
+    fnameNew = "../root_files/pileup/8TeV/dataPileupHildreth_mean_full2012_20131106_repacked";
+    outputHistName = "pileup_lumibased_data";
+  }else if( sample == GENERAL_MC_8TEV_MEAN ){
+    fname    = "../root_files/pileup/tmp/mcPileupHildreth_mean_full2012_20131106";
+    fnameNew = "../root_files/pileup/8TeV/mcPileupHildreth_mean_full2012_20131106_repacked";
     outputHistName = "pileup_simulevel_mc";
   }
   

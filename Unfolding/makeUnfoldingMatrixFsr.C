@@ -967,7 +967,7 @@ void makeUnfoldingMatrixFsr(const TString input,
 //       int nGoodVertices=1;
       double wPU=1.0;
       if (performPUReweight) {
-	wPU = puWeight.getWeightHildreth(info->nPU);
+	wPU = puWeight.getWeightHildreth(info->nPUmean);
 	// For the Hildreth method, we use not the number of
 	// good reconstructed vertices, but the gen level number of PU events, above
 // 	pvArr->Clear();

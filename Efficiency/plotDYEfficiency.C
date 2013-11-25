@@ -335,7 +335,7 @@ void plotDYEfficiency(const TString input,
       }
 
 #ifdef usePUReweight
-      puWeight = puReweight.getWeightHildreth(info->nPU);
+      puWeight = puReweight.getWeightHildreth(info->nPUmean);
       nZv_puUnweighted += scale * gen->weight;
       nZv_puWeighted += scale * gen->weight * puWeight;
 #endif

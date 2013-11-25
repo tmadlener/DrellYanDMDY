@@ -616,7 +616,7 @@ void eff_Reco(const TString configFile, const TString effTypeString,
 		  }
 		}
 	  }else{
-	    storeNGoodPV = info->nPU;
+	    storeNGoodPV = info->nPUmean;
 	  }
 
 	  // total probes
