@@ -19,7 +19,7 @@ _debugMode=$6
 
 extraPath="./"
 debugMode=0
-dirTag="DY_j22_19672pb";
+dirTag="DY_j22_19712pb";
 sourceConfigFile="../config_files/data8TeV.conf"       # needed to prepare yields
 mcConfInputFile="../config_files/summer12mc.input"   # needed for unfolding
 tmpConfFilePath="../config_files/escale"

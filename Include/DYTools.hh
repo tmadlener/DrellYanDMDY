@@ -62,7 +62,7 @@ namespace DYTools {
 //   const double lumiAtECMS=4839.;
 //   const double lumiAtECMS_accuracy=1.;
   const TString strLumiAtECMS="19.7 fb^{-1} at #sqrt{s} = 8 TeV";
-  const double lumiAtECMS=19672.;
+  const double lumiAtECMS=19712.;
   const double lumiAtECMS_accuracy=1.;
 
 

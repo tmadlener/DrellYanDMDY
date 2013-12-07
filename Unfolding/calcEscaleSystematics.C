@@ -23,7 +23,7 @@ int printTexTable(const TString &texFileName, const std::vector<TString>& header
 
 // -----------------------------------------------------------
 
-void calcEscaleSystematics(TString lumiTag="DY_j22_19672pb", 
+void calcEscaleSystematics(TString lumiTag="DY_j22_19712pb", 
 int saveTexTable=0){
 
   int nUnfoldingBins = DYTools::getTotalNumberOfBins();
