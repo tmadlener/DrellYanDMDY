@@ -10,7 +10,10 @@
 # ------------------  Define some variables
 
 anTagUser=
-anTag="2D${anTagUser}"      # 1D or 2D plus analysisTag_USER, see DYTools.hh
+
+# from 2014.01.25 auto-determined later
+#anTag="2D${anTagUser}"   # 1D or 2D plus analysisTag_USER, see DYTools.hh
+
 filename_data="../config_files/data8TeV.conf"
 filename_mc="../config_files/summer12mc.input"
 filename_cs="../config_files/xsecCalc8TeV.conf"
@@ -74,6 +77,11 @@ do_efficiencyScaleFactors=1
 do_escaleSystematics=1  # very long calculation!
 
 
+# Determine whether it is 1D or 2D case
+chkDYTools=`grep study2D=0 ../Include/DYTools.hh`
+if [ ${#chkDYTools} -eq 0 ] ; then anTag="2D${anTagUser}"; else anTag="1D${anTagUser}"; fi
+echo "anTag=${anTag}"
+exit
 
 # the variables below are more persistent
 crossSectionTag="DY_j22_19712pb"
