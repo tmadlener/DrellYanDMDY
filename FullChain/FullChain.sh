@@ -81,7 +81,7 @@ do_escaleSystematics=1  # very long calculation!
 chkDYTools=`grep study2D=0 ../Include/DYTools.hh`
 if [ ${#chkDYTools} -eq 0 ] ; then anTag="2D${anTagUser}"; else anTag="1D${anTagUser}"; fi
 echo "anTag=${anTag}"
-exit
+
 
 # the variables below are more persistent
 crossSectionTag="DY_j22_19712pb"
