@@ -26,6 +26,8 @@ public:
     Date20121025FEWZPU_default, // FEWZ correction and PU reweighting were considered in derivation
     Date20130612_default, // First calibration for Jan22, 8 TeV from Andrius
     Date20130529_2012_j22_adhoc,  // a guess to what the calib. should be for Jan22 8 TeV data based on official constants
+    Date20131217_2012_j22_peak_position, // scaling derived so that the peak in data and mc matches,
+                                         // for reco with momentum regression. No MC smearing. 
     CalSet_File_Gauss,
     CalSet_File_BreitWigner,
     CalSet_File_Voigt
