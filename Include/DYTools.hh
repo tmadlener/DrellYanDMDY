@@ -103,7 +103,7 @@ namespace DYTools {
     }; // overflow is neglected
 
   
-  // ------------- 2011 and 2010 content is below ---------------
+  // ------------- 2012, 2011 and 2010 content is below ---------------
 
   // Systematics modes for unfolding and acceptance 
   typedef enum {NORMAL, RESOLUTION_STUDY, FSR_STUDY, ESCALE_RESIDUAL, ESCALE_STUDY, ESCALE_STUDY_RND } TSystematicsStudy_t;
@@ -141,6 +141,21 @@ namespace DYTools {
      510, 600, 1000, 1500}; // 40 bins
   const int _nYBinsMax2011=1; // the largest division into Y bins
   const int _nYBins2011[_nMassBins2011] = { 
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+  };
+
+  // 2012 mass binning
+  const int _nMassBins2012 = 41;
+  const double _massBinLimits2012[_nMassBins2012+1] = 
+    {15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 64, 68, 72, 76, 
+     81, 86, 91, 96, 101, 106, 110, 115, 120, 126, 133, 141, 
+     150, 160, 171, 185, 200, 220, 243, 273, 320, 380, 440, 
+     510, 600, 1000, 1500, 2000}; // 41 bins
+  const int _nYBinsMax2012=1; // the largest division into Y bins
+  const int _nYBins2012[_nMassBins2012] = { 
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -197,13 +212,14 @@ namespace DYTools {
   };
 
   // some derived bin idx finders -- for debug
+  inline int _findMassBin2012(double mass) { return _findMassBin(mass,_nMassBins2012,_massBinLimits2012); }
   inline int _findMassBin2011(double mass) { return _findMassBin(mass,_nMassBins2011,_massBinLimits2011); }
   inline int _findMassBin13(double mass) { return _findMassBin(mass,_nMassBins13,_massBinLimits13); }
   inline int _findMassBinLumi(double mass) { return _findMassBin(mass,_nMassBinsLumi,_massBinLimitsLumi); }
   inline int _findMassBinZpeak(double mass) { return _findMassBin(mass,_nMassBinsZpeak,_massBinLimitsZpeak); }
 
 // Declare mass binnings
-  typedef enum { _MassBins_Undefined, _MassBins_2010, _MassBins_2011, _MassBins_2011_Lumi, _MassBins_2011_2D, _MassBins_test4, _MassBins_Zpeak } TMassBinning_t;
+  typedef enum { _MassBins_Undefined, _MassBins_2010, _MassBins_2011, _MassBins_2012, _MassBins_2011_Lumi, _MassBins_2011_2D, _MassBins_test4, _MassBins_Zpeak } TMassBinning_t;
 
 
   // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
@@ -212,11 +228,11 @@ namespace DYTools {
   
 
 #ifndef _check_Zpeak
-  const DYTools::TMassBinning_t massBinningSet=(study2D) ? _MassBins_2011_2D : _MassBins_2011;
-  const int nMassBins=(study2D) ? _nMassBins2D : _nMassBins2011;
-  const double *massBinLimits=(study2D) ? _massBinLimits2D : _massBinLimits2011;
-  const int *nYBins=(study2D) ? _nYBins2D : _nYBins2011;
-  const int nYBinsMax=(study2D) ? _nYBinsMax2D : _nYBinsMax2011;
+  const DYTools::TMassBinning_t massBinningSet=(study2D) ? _MassBins_2011_2D : _MassBins_2012;
+  const int nMassBins=(study2D) ? _nMassBins2D : _nMassBins2012;
+  const double *massBinLimits=(study2D) ? _massBinLimits2D : _massBinLimits2012;
+  const int *nYBins=(study2D) ? _nYBins2D : _nYBins2012;
+  const int nYBinsMax=(study2D) ? _nYBinsMax2D : _nYBinsMax2012;
 #else
   const DYTools::TMassBinning_t massBinningSet=(study2D) ? _MassBins_2011_2D : _MassBins_Zpeak;
   const int nMassBins=(study2D) ? _nMassBins2D : _nMassBinsZpeak;
