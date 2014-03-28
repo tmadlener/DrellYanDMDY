@@ -435,15 +435,15 @@ void DrawMassPeak(vector<TH1F*> hMassv, vector<CSample*> samplev, vector<TString
   if (actualBinning)
     {
       plotMass.SetYRange(1.0,2000000);  
-      plotMass.SetXRange(20,1500);
+      plotMass.SetXRange(20, DYTools::massBinLimits[DYTools::nMassBins-1]);
       double plotMassMin=(DYTools::study2D) ? 20. : 15.;
-      plotMass.SetXRange(plotMassMin,1500);
+      plotMass.SetXRange(plotMassMin,DYTools::massBinLimits[DYTools::nMassBins-1]);
     }
   else
     {
       plotMass.SetYRange(1.0,300000);
       double plotMassMin=(DYTools::study2D) ? 20. : 15.;
-      plotMass.SetXRange(plotMassMin,1500);
+      plotMass.SetXRange(plotMassMin,DYTools::massBinLimits[DYTools::nMassBins-1]);
     }  
   plotMass.Draw(c1,kFALSE);
   SaveCanvas(c1, canvName);
@@ -455,12 +455,12 @@ void DrawMassPeak(vector<TH1F*> hMassv, vector<CSample*> samplev, vector<TString
   SetSomeHistAttributes(hMassDibosons,"ewk");
   if (actualBinning)
     {
-      hMassDibosons->GetXaxis()->SetRangeUser((DYTools::study2D) ? 20. : 15.,1500);
+      hMassDibosons->GetXaxis()->SetRangeUser((DYTools::study2D) ? 20. : 15.,DYTools::massBinLimits[DYTools::nMassBins-1]);
       hMassDibosons->GetYaxis()->SetRangeUser(1.0,2000000);
     }
   else
     {
-      hMassDibosons->GetXaxis()->SetRangeUser((DYTools::study2D) ? 20. : 15.,1500);
+      hMassDibosons->GetXaxis()->SetRangeUser((DYTools::study2D) ? 20. : 15.,DYTools::massBinLimits[DYTools::nMassBins-1]);
       hMassDibosons->GetYaxis()->SetRangeUser(1.0,300000);
     }  
   THStack* mcHists=new THStack("mcHists","MC hists");
@@ -469,12 +469,12 @@ void DrawMassPeak(vector<TH1F*> hMassv, vector<CSample*> samplev, vector<TString
     SetSomeHistAttributes(hMassv[isam],snamev[isam]);
     if (actualBinning)
     {
-      hMassv[isam]->GetXaxis()->SetRangeUser((DYTools::study2D) ? 20. : 15.,1500);
+      hMassv[isam]->GetXaxis()->SetRangeUser((DYTools::study2D) ? 20. : 15.,DYTools::massBinLimits[DYTools::nMassBins-1]);
       hMassv[isam]->GetYaxis()->SetRangeUser(1.0,2000000);
     }
     else
     {
-      hMassv[isam]->GetXaxis()->SetRangeUser((DYTools::study2D) ? 20. : 15.,1500);
+      hMassv[isam]->GetXaxis()->SetRangeUser((DYTools::study2D) ? 20. : 15.,DYTools::massBinLimits[DYTools::nMassBins-1]);
       hMassv[isam]->GetYaxis()->SetRangeUser(1.0,300000);
     } 
     if( !(mergeDibosons && (snamev[isam]=="ww" || snamev[isam]=="wz" || snamev[isam]=="zz")))
@@ -759,7 +759,7 @@ void Draw6Canvases(vector<TMatrixD*> yields, vector<TMatrixD*> yieldsSumw2,
   TPad* pad1[DYTools::nMassBins];
   TPad* pad2[DYTools::nMassBins];
 
-  TLine *lineAtOne = new TLine(15.0, 1.0, 1500, 1.0);
+  TLine *lineAtOne = new TLine(15.0, 1.0, DYTools::massBinLimits[DYTools::nMassBins-1], 1.0);
   lineAtOne->SetLineStyle(kDashed);
   lineAtOne->SetLineWidth(1);
   lineAtOne->SetLineColor(kBlue);

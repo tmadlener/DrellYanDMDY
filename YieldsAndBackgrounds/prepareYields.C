@@ -221,7 +221,7 @@ void prepareYields(const TString conf  = "data_plot.conf",
     sampleTags.push_back(snamev[isam]);
 
     sprintf(hname,"hMass_%i",isam);  
-    hMassv.push_back(new TH1F(hname,"",1490,10,1500));  
+    hMassv.push_back(new TH1F(hname,"",1990,10,2000));  
     hMassv[isam]->Sumw2();
     sprintf(hname,"hMassBins_%i",isam);  
     hMassBinsv.push_back(new TH1F(hname,"",

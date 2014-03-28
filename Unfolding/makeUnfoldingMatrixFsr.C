@@ -875,7 +875,7 @@ void makeUnfoldingMatrixFsr(const TString input,
   eventCounter_t totEC;
 
   for(UInt_t ifile = 0; ifile<fnamev.size(); ifile++) {
-    sprintf(hname,"hZMass_%i",ifile); hZMassv.push_back(new TH1F(hname,"",500,0,1500)); hZMassv[ifile]->Sumw2();
+    sprintf(hname,"hZMass_%i",ifile); hZMassv.push_back(new TH1F(hname,"",500,0,2000)); hZMassv[ifile]->Sumw2();
   }
 
   TH1F *hMassDiff   = new TH1F("hMassDiff","", 100, -30, 30);

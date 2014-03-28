@@ -113,8 +113,8 @@ void plotDYFSRCorrections(const TString input, bool sansAcc=0, int debugMode=0)
   // Set up histograms
   //
   vector<TH1F*> hZMassv;//, hZMass2v, hZPtv, hZPt2v, hZyv, hZPhiv;  
-  TH1F *hMassPreFsr = new TH1F("hMassPreFsr","",500,0,1500);
-  TH1F *hMassPostFsr = new TH1F("hMassPostFsr","",500,0,1500);
+  TH1F *hMassPreFsr = new TH1F("hMassPreFsr","",500,0,2000);
+  TH1F *hMassPostFsr = new TH1F("hMassPostFsr","",500,0,2000);
   
   UInt_t   nZ = 0;
   Double_t nZweighted=0;
@@ -131,7 +131,7 @@ void plotDYFSRCorrections(const TString input, bool sansAcc=0, int debugMode=0)
   char hname[100];
   for(UInt_t ifile = 0; ifile<fnamev.size(); ifile++) {
     sprintf(hname,"hZMass_%i",ifile); 
-    hZMassv.push_back(new TH1F(hname,"",500,0,1500)); 
+    hZMassv.push_back(new TH1F(hname,"",500,0,2000)); 
     hZMassv[ifile]->Sumw2();
   }
 
