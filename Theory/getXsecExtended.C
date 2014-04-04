@@ -41,6 +41,9 @@
 template <class T>
 inline T SQR(T x) { return (x)*(x); }
 
+const double maxMass = DYTools::massBinLimits[DYTools::nMassBins];
+
+
 //=== FUNCTION DECLARATIONS ======================================================================================
 
 double getErrorOnRatio(double nTotal, double nTotalErr, double nPass, double nPassErr) {
@@ -220,7 +223,7 @@ void getXsecExtended(const TString mc_input, int debugMode=0, bool useFEWZ=true,
       else if( iTh >=  18 && iTh < 118 ) {mxl += 1.0;}
       else if( iTh >= 118 && iTh < 340 ) {mxl += 2.0;}
       else if( iTh >= 340 && iTh < nMassBinTh)   {mxl += 5.0; }
-      else if( iTh == nMassBinTh)                {mxl = 1500; }
+      else if( iTh == nMassBinTh)                {mxl = maxMass; } // used to be 1500
       massRangeEdges[iTh]=mxl;
     }
   }
@@ -258,10 +261,10 @@ void getXsecExtended(const TString mc_input, int debugMode=0, bool useFEWZ=true,
 	}
 	mxl += 5.0; 
       }
-      else if( iTh == nMassBinTh)                {mxl = 1500; }
+      else if( iTh == nMassBinTh)                {mxl = maxMass; } // used to be 1500
       massRangeEdges[iTh_new]=mxl;
     }
-    massRangeEdges[iTh_new-2]=1500.;
+    massRangeEdges[iTh_new-2]=maxMass; // used to be 1500
     std::cout << "iTh_new=" << iTh_new << "\n";
     locMassBinCount=iTh_new-2;
   }
