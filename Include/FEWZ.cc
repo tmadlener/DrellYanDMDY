@@ -205,7 +205,7 @@ double weight_FEWZ8TeV( double muon_pt, double muon_rap, double mass) {
  } else if (mass >= 64 && mass < 120) {
    index_pt = Find_Index2(muon_pt, true);
    index_rap = Find_Index2(muon_rap, false);
- } else if (mass >= 120 && mass < 1500) {
+ } else if (mass >= 120 && mass < 2000) {
    index_pt = Find_Index3(muon_pt, true);
    index_rap = Find_Index3(muon_rap, false);
  }
@@ -431,6 +431,10 @@ double weights_fewz_6001000[2][3] = {{
 double weights_fewz_10001500[2][3] = {{
 0.973859, 1.01897, 0.826874}, {
 1.02721, 0.945956, 0.81459}};
+//#41
+double weights_fewz_15002000[2][3] = {{
+1.01542, 1.009672, 0.819218}, {
+1.02512, 0.940146, 0.803916}};
 
     if (mass >= 15 && mass < 20) {
        return weights_fewz_1520[index_rap][index_pt];
@@ -512,6 +516,8 @@ double weights_fewz_10001500[2][3] = {{
       return weights_fewz_6001000[index_rap][index_pt];
     } else if (mass >= 1000 && mass < 1500) {
       return weights_fewz_10001500[index_rap][index_pt];
+    } else if (mass >= 1500 && mass < 2000) {
+      return weights_fewz_15002000[index_rap][index_pt];
     }
 
     return 1.;

@@ -15,13 +15,13 @@
 
 #ifdef _8TeV_analysis_
 // 8 TeV FEWZ map is based on file from Alexey
-const int _nMassBinsFEWZ_8TeV = 40;
+const int _nMassBinsFEWZ_8TeV = 41;
 const double _massBinLimitsFEWZ_8TeV[_nMassBinsFEWZ_8TeV + 1] = 
   {  15,  20,  25,  30,  35,  40,  45,  50,  55,  60, 
      64,  68,  72,  76,  81,  86,  91,  96, 101, 106, 
     110, 115, 120, 126, 133, 141, 150, 160, 171, 185,
     200, 220, 243, 273, 320, 380, 440, 510, 600,1000,
-   1500 };
+     1500, 2000 };
 const int _nMassBinsFEWZ = _nMassBinsFEWZ_8TeV;
 const double *_massBinLimitsFEWZ = _massBinLimitsFEWZ_8TeV;
 #else
