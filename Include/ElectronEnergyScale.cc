@@ -398,7 +398,7 @@ bool ElectronEnergyScale::initializeAllConstants(int debug){
   case Date20121003FEWZ_default: nEtaBins1=12; break;
   case Date20121025FEWZPU_default: nEtaBins1=12; break;
   case Date20130612_default : nEtaBins1=12; break;
-  case Date20131217_2012_j22_peak_position : nEtaBins1=12; break;
+  case Date20140220_2012_j22_peak_position : nEtaBins1=12; break;
   case Date20130529_2012_j22_adhoc: nEtaBins1=8; break;
   case CalSet_File_Gauss: 
   case CalSet_File_Voigt:
@@ -754,7 +754,7 @@ bool ElectronEnergyScale::initializeAllConstants(int debug){
   }
     break;
 
-  case Date20131217_2012_j22_peak_position: {
+  case Date20140220_2012_j22_peak_position: {
     //
     // Constants derived so that the Z peak position in data 
     // matches MC. All constants are the same for data. There is
@@ -884,14 +884,21 @@ bool ElectronEnergyScale::initializeExtraSmearingFunction(int normalize){
       case Date20121003FEWZ_default:
       case Date20121025FEWZPU_default:
       case Date20130612_default:
-      case Date20131217_2012_j22_peak_position:
+      case Date20140220_2012_j22_peak_position:
       case CalSet_File_Gauss: {
 	if(_mcConst1 == 0) continue;
-	smearingFunctionGrid[i][j] = new TF1(fname, "gaus(0)", -10, 10);
-	smearingFunctionGrid[i][j]->SetNpx(500);
 	double si = _mcConst1[i];
 	double sj = _mcConst1[j];
 	double sij=sqrt(si*si+sj*sj);
+	if( sij == 0 ){
+	  // This means no smearing is needed. However, the Gaussian
+	  // generates weird random numbers if its width is zero.
+	  // So simply constrain the range in this case.
+	  smearingFunctionGrid[i][j] = new TF1(fname, "gaus(0)", -1e-6, 1e-6);
+	}else{
+	  smearingFunctionGrid[i][j] = new TF1(fname, "gaus(0)", -10, 10);
+	}
+	smearingFunctionGrid[i][j]->SetNpx(500);
 	double amp=(normalize) ? 1.0/(sij*sqrt(8*atan(1))) : 1.0;
 	smearingFunctionGrid[i][j]->SetParameters(amp,0.0,sij);
       }
@@ -1155,7 +1162,7 @@ void ElectronEnergyScale::randomizeSmearingWidth(int seed){
   case Date20121003FEWZ_default:
   case Date20121025FEWZPU_default:
   case Date20130612_default:
-  case Date20131217_2012_j22_peak_position:
+  case Date20140220_2012_j22_peak_position:
   case CalSet_File_Gauss: {
 
     for( int i=0; i<_nEtaBins; i++){
@@ -1540,8 +1547,8 @@ ElectronEnergyScale::CalibrationSet ElectronEnergyScale::DetermineCalibrationSet
   else if ( (pos==0) || escaleTagName.Contains("Date20130612_default") ) {
     calibrationSet = ElectronEnergyScale::Date20130612_default;
   }
-  else if ( (pos==0) || escaleTagName.Contains("Date20131217_2012_j22_peak_position") ) {
-    calibrationSet = ElectronEnergyScale::Date20131217_2012_j22_peak_position;
+  else if ( (pos==0) || escaleTagName.Contains("Date20140220_2012_j22_peak_position") ) {
+    calibrationSet = ElectronEnergyScale::Date20140220_2012_j22_peak_position;
   }
   else if ( (pos==0) || escaleTagName.Contains("Date20130529_2012_j22_adhoc") ) {
     calibrationSet = ElectronEnergyScale::Date20130529_2012_j22_adhoc;
@@ -1603,7 +1610,7 @@ TString ElectronEnergyScale::CalibrationSetName(ElectronEnergyScale::Calibration
   case ElectronEnergyScale::Date20121003FEWZ_default: name="Date20121003FEWZ_default"; break;
   case ElectronEnergyScale::Date20121025FEWZPU_default: name="Date20121025FEWZPU_default"; break;
   case ElectronEnergyScale::Date20130612_default: name="Date20130612_default"; break;
-  case ElectronEnergyScale::Date20131217_2012_j22_peak_position: name="Date20131217_2012_j22_peak_position"; break;
+  case ElectronEnergyScale::Date20140220_2012_j22_peak_position: name="Date20140220_2012_j22_peak_position"; break;
   case ElectronEnergyScale::Date20130529_2012_j22_adhoc: name="Date20130529_2012_j22_adhoc"; break;
   case ElectronEnergyScale::CalSet_File_Gauss: 
     name="FileGauss(";
@@ -1639,7 +1646,7 @@ TString ElectronEnergyScale::CalibrationSetFunctionName(ElectronEnergyScale::Cal
   case ElectronEnergyScale::Date20121003FEWZ_default: break; // Gauss
   case ElectronEnergyScale::Date20121025FEWZPU_default: break; // Gauss
   case ElectronEnergyScale::Date20130612_default: break; // Gauss
-  case ElectronEnergyScale::Date20131217_2012_j22_peak_position: break; // Gauss
+  case ElectronEnergyScale::Date20140220_2012_j22_peak_position: break; // Gauss
   case ElectronEnergyScale::Date20130529_2012_j22_adhoc: break; // Gauss
   case ElectronEnergyScale::CalSet_File_Gauss: break; // Gauss
   case ElectronEnergyScale::CalSet_File_Voigt: name="Voigt"; break;
@@ -1663,7 +1670,7 @@ TString ElectronEnergyScale::calibrationSetShortName() const {
   case ElectronEnergyScale::Date20121003FEWZ_default: name="default20121003FEWZ"; break;
   case ElectronEnergyScale::Date20121025FEWZPU_default: name="default20121025FEWZPU"; break;
   case ElectronEnergyScale::Date20130612_default: name="default20130612"; break;
-  case ElectronEnergyScale::Date20131217_2012_j22_peak_position: name="peak20130612"; break;
+  case ElectronEnergyScale::Date20140220_2012_j22_peak_position: name="peak20130612"; break;
   case ElectronEnergyScale::Date20130529_2012_j22_adhoc: name="adhoc20130529j22"; break;
   case ElectronEnergyScale::CalSet_File_Gauss: name="Gauss"; break;
   case ElectronEnergyScale::CalSet_File_Voigt: name="Voigt"; break;
