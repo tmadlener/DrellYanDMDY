@@ -75,7 +75,12 @@ public:
 //     return weight;
 //   }
 
-  double getWeightTwoHistos(int nGoodPV) const {
+  double getWeightTwoHistos(float nGoodPV) const {
+    // Note: when written originally, this method used as the argument the number of primary
+    // vertices which was naturally an integer. Later we switched to using
+    // the mean/expected number of pile-up, which could be non-integer. The
+    // name of the argument is left as it was, though.
+    //
     double w=0;
     if (!hWeight) {
       std::cout << "PUReweight::getWeightTwoHistos: call setActiveSample first\n";
@@ -88,7 +93,7 @@ public:
     return w;
   }
 
-  double getWeightHildreth(int nPU) const {
+  double getWeightHildreth(float nPU) const {
     double w=0;
     if (!hWeightHildreth) {
       std::cout << " The weights for Hildreth's method not available\n";
