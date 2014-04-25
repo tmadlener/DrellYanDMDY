@@ -28,13 +28,17 @@
 
 // define classes and constants to read in ntuple
 #include "../Include/EWKAnaDefs.hh"
+#include "../Include/TEventInfo.hh"
 #include "../Include/TGenInfo.hh"
 
 #include "../Include/EventSelector.hh"
 #include "../Include/FEWZ.hh"
+#include "../Include/PUReweight.hh"
 #include "../Include/UnfoldingTools.hh"
 #include "../Include/InputFileMgr.hh"
 #endif
+
+#define usePUReweight  // Whether apply PU reweighting
 
 //=== FUNCTION DECLARATIONS ======================================================================================
 
@@ -202,6 +206,12 @@ void plotDYAcceptance(const TString input, int systematicsMode = DYTools::NORMAL
     weights[i]->SetDirectory(0); weightErrors[i]->SetDirectory(0);
   }
   }
+
+  // Set up pile-up reweighting
+#ifdef usePUReweight
+  PUReweight_t puReweight;
+#endif
+
   //
   // Access samples and fill histograms
   //  
@@ -209,6 +219,7 @@ void plotDYAcceptance(const TString input, int systematicsMode = DYTools::NORMAL
   TTree *eventTree=0;  
     
   // Data structures to store info from TTrees
+  mithep::TEventInfo *info = new mithep::TEventInfo();
   mithep::TGenInfo *gen  = new mithep::TGenInfo();
 
   int noFewz=0;//counter of events for which fewz weight was not found
@@ -235,6 +246,8 @@ void plotDYAcceptance(const TString input, int systematicsMode = DYTools::NORMAL
     cout << "       -> sample weight is " << scale << endl;
 
     // Set branch address to structures that will store the info  
+    eventTree->SetBranchAddress("Info",&info);                
+    TBranch *infoBr       = eventTree->GetBranch("Info");
     eventTree->SetBranchAddress("Gen",&gen);
     TBranch *genBr = eventTree->GetBranch("Gen");
  
@@ -247,6 +260,7 @@ void plotDYAcceptance(const TString input, int systematicsMode = DYTools::NORMAL
       if (ientry%1000000==0) printProgress("ientry=",ientry,eventTree->GetEntriesFast());
 
       genBr->GetEntry(ientry);
+      infoBr->GetEntry(ientry);
 
       // Which mass is used?
       double massPreFsr = gen->vmass;   // pre-FSR
@@ -284,6 +298,13 @@ void plotDYAcceptance(const TString input, int systematicsMode = DYTools::NORMAL
 	//printf(".. skipping mass=%6.4lf, y=%6.4lf. ibinMass=%d, ibinY=%d\n",mass,y,ibinMass,ibinY);
 	continue;
       }
+
+      // Find PU weight
+      double puWeight = 1.0;
+#ifdef usePUReweight
+      puWeight = puReweight.getWeightHildreth(info->nPUmean);
+#endif
+
 
       // Find FEWZ-powheg reweighting factor 
       // that depends on pre-FSR Z/gamma* rapidity, pt, and mass
@@ -324,7 +345,7 @@ void plotDYAcceptance(const TString input, int systematicsMode = DYTools::NORMAL
       }
 
       if(ibinMass != -1 && ibinMass < nEventsv.GetNrows()){
-	double fullWeight = reweight * scale * gen->weight * fewz_weight;
+	double fullWeight = reweight * scale * gen->weight * fewz_weight * puWeight;
 	nEventsv(ibinMass,ibinY) += fullWeight;
 	w2Eventsv(ibinMass,ibinY) += fullWeight*fullWeight;
       }else if(ibinMass >= nEventsv.GetNrows())
@@ -339,15 +360,15 @@ void plotDYAcceptance(const TString input, int systematicsMode = DYTools::NORMAL
       if( DYTools::goodEtEtaPair( gen->pt_1, gen->eta_1, gen->pt_2, gen->eta_2 ) ){
 	
 	if(ibinMass != -1 && ibinMass < nPassv.GetNrows()){
-	  double fullWeight = reweight * scale * gen->weight * fewz_weight;
+	  double fullWeight = reweight * scale * gen->weight * fewz_weight * puWeight;
 	  nPassv(ibinMass,ibinY) += fullWeight;
 	  w2Passv(ibinMass,ibinY) += fullWeight*fullWeight;
-	  if(isB1 && isB2)                          { nPassBBv(ibinMass,ibinY) += reweight * scale * gen->weight * fewz_weight; } 
-	  else if(isE1 && isE2)                     { nPassEEv(ibinMass,ibinY) += reweight * scale * gen->weight * fewz_weight; } 
-	  else if((isB1 && isE2) || (isE1 && isB2)) { nPassBEv(ibinMass,ibinY) += reweight * scale * gen->weight * fewz_weight; }
+	  if(isB1 && isB2)                          { nPassBBv(ibinMass,ibinY) += reweight * scale * gen->weight * fewz_weight * puWeight; } 
+	  else if(isE1 && isE2)                     { nPassEEv(ibinMass,ibinY) += reweight * scale * gen->weight * fewz_weight * puWeight; } 
+	  else if((isB1 && isE2) || (isE1 && isB2)) { nPassBEv(ibinMass,ibinY) += reweight * scale * gen->weight * fewz_weight * puWeight; }
 	}
       }
-      hZMassv[ifile]->Fill(mass,reweight * scale * gen->weight * fewz_weight);
+      hZMassv[ifile]->Fill(mass,reweight * scale * gen->weight * fewz_weight * puWeight);
 
     }   
     delete infile;
@@ -355,6 +376,7 @@ void plotDYAcceptance(const TString input, int systematicsMode = DYTools::NORMAL
 
   }
   delete gen;
+  delete info;
 
   std::cout<<"for "<<noFewz<<" events fewz-weight was not found"<<std::endl;  
 
