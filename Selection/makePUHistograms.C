@@ -65,11 +65,13 @@ void makePUHistograms(const TString conf,
 
   // fast check
   TriggerConstantSet triggerSet=DetermineTriggerSet(triggerSetString);  
-  assert ( triggerSet != TrigSet_UNDEFINED );
+  if( ! ( triggerSet != TrigSet_UNDEFINED ) )
+    assert(0);
 
   // Construct the trigger object
   TriggerSelection requiredTriggers(triggerSetString, true, 0);
-  assert(requiredTriggers.isDefined());
+  if( !requiredTriggers.isDefined())
+    assert(0);
 
   if (debugMode) std::cout << "\n\n\tDEBUG MODE is ON\n\n";
 
@@ -92,7 +94,8 @@ void makePUHistograms(const TString conf,
   //
   ifstream ifs;
   ifs.open(conf.Data());
-  assert(ifs.is_open());
+  if( !ifs.is_open())
+    assert(0);
   string line;
   Int_t state=0;
   string generateEEMFile;

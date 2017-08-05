@@ -96,11 +96,13 @@ void selectEvents(const TString conf,
 
   // fast check
   TriggerConstantSet triggerSet=DetermineTriggerSet(triggerSetString);  
-  assert ( triggerSet != TrigSet_UNDEFINED );
+  if( ! ( triggerSet != TrigSet_UNDEFINED ) )
+    assert(0);
 
   // Construct the trigger object
   TriggerSelection requiredTriggers(triggerSetString, true, 0);
-  assert(requiredTriggers.isDefined());
+  if(!requiredTriggers.isDefined())
+    assert(0);
 
   if (debugMode) std::cout << "\n\n\tDEBUG MODE is ON\n\n";
 
@@ -135,7 +137,8 @@ void selectEvents(const TString conf,
   //
   ifstream ifs;
   ifs.open(conf.Data());
-  assert(ifs.is_open());
+  if( !ifs.is_open())
+    assert(0);
   string line;
   Int_t state=0;
   string generateEEMFile;
@@ -209,7 +212,8 @@ void selectEvents(const TString conf,
   //
 
   ElectronEnergyScale escale(escaleTag);
-  assert(escale.isInitialized());
+  if( !escale.isInitialized()) 
+    assert(0);
   escale.print();
   TString escaleFileTag=escale.calibrationSetShortName();
   std::cout << "escaleFileTag=<" << escaleFileTag << ">\n";
@@ -318,7 +322,8 @@ void selectEvents(const TString conf,
   if(cutZPT100)
     cout << "NOTE: in MC, for Z/gamma* PT>100 the FEWZ weights for 80<PT<100 GeV are used!" << endl;
   TFile fweights("../root_files/fewz/weights_stepwise_prec10-5_fine12.root");
-  if( !fweights.IsOpen() ) assert(0);
+  if( !fweights.IsOpen() ) 
+    assert(0);
   for(int i=0; i<DYTools::nMassBins; i++){
     TString hnames = TString::Format("weight_%02d",i+1);
     weights[i] = (TH2D*)fweights.Get(hnames);
@@ -355,7 +360,8 @@ void selectEvents(const TString conf,
   sprintf(evtfname,"%s/events.txt",outputDir.Data());
   if (dump_events) {
     evtfile.open(evtfname);
-    assert(evtfile.is_open());
+    if( !evtfile.is_open())
+      assert(0);
   }
   
   //
@@ -739,7 +745,8 @@ void selectEvents(const TString conf,
           }
 	  }
 #ifdef usePUReweight
-	  assert(puReweight.Fill(nGoodPV,weight));
+	  if( !puReweight.Fill(nGoodPV,weight))
+	    assert(0);
 #else
           hNGoodPVv[isam]->Fill(nGoodPV,weight);
 #endif
@@ -892,7 +899,8 @@ void selectEvents(const TString conf,
   char txtfname[100];    
   sprintf(txtfname,"%s/summary.txt",outputDir.Data());
   txtfile.open(txtfname);
-  assert(txtfile.is_open());
+  if( !txtfile.is_open())
+    assert(0);
   txtfile << "*" << endl;
   txtfile << "* SUMMARY" << endl;
   txtfile << "*--------------------------------------------------" << endl;

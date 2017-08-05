@@ -78,7 +78,8 @@ void plotDYFSRCorrections(const TString input, bool sansAcc=0, int debugMode=0)
   else {
   ifstream ifs;
   ifs.open(input.Data());
-  assert(ifs.is_open());
+  if( !ifs.is_open())
+    assert(0);
   string line;
   Int_t state=0;
   while(getline(ifs,line)) {

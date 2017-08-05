@@ -774,7 +774,11 @@ bool ElectronEnergyScale::initializeAllConstants(int debug){
        0.00159, 0.00159, 0.00159, 0.00159, 0.00159, 0.00159};
 
     const double smearValues[nEtaBins] = 
-      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+      {1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 
+       1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 1e-10};
+    // Since ROOT does not like Gaussians with zero width, make it 
+    // a very small number as above.
+    //{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     const double smearErrors[nEtaBins] =
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -894,7 +898,7 @@ bool ElectronEnergyScale::initializeExtraSmearingFunction(int normalize){
 	  // This means no smearing is needed. However, the Gaussian
 	  // generates weird random numbers if its width is zero.
 	  // So simply constrain the range in this case.
-	  smearingFunctionGrid[i][j] = new TF1(fname, "gaus(0)", -1e-6, 1e-6);
+	  smearingFunctionGrid[i][j] = new TF1(fname, "gaus(0)", -1e-9, 1e-9);
 	}else{
 	  smearingFunctionGrid[i][j] = new TF1(fname, "gaus(0)", -10, 10);
 	}
@@ -1359,7 +1363,10 @@ bool ElectronEnergyScale::addSmearedWeightAny(TH1F *hMass, int eta1Bin, int eta2
   }
 
   eta1Bin--; eta2Bin--;
-  assert((eta1Bin>=0)); assert((eta2Bin>=0));
+  if( !(eta1Bin>=0) )
+    assert(0); 
+  if( !(eta2Bin>=0) )
+    assert(0);
   TF1 *smearFnc = (randomize) ? 
     smearingFunctionGridRandomized[eta1Bin][eta2Bin] :
     smearingFunctionGrid[eta1Bin][eta2Bin];
@@ -1381,7 +1388,8 @@ bool ElectronEnergyScale::addSmearedWeightAny(TH1F *hMass, int eta1Bin, int eta2
 void ElectronEnergyScale::smearDistributionAny(TH1F *destination, int eta1Bin, int eta2Bin, const TH1F *source, bool randomize) const {
   assert(source); assert(destination);
   for (int i=1; i<source->GetNbinsX(); ++i) {
-    assert(addSmearedWeightAny(destination,eta1Bin,eta2Bin,source->GetBinCenter(i),source->GetBinContent(i),randomize));
+    if( !addSmearedWeightAny(destination,eta1Bin,eta2Bin,source->GetBinCenter(i),source->GetBinContent(i),randomize))
+      assert(0);
   }
 }
 
@@ -1433,10 +1441,12 @@ void ElectronEnergyScale::print() const {
 
 void ElectronEnergyScale::printAsTexTable(const TString &fname) const {
   std::cout << "printAsTexTable(" << fname << ") WARNING: assuming Gaussian distribution\n";
-  assert( !_mcConst2 && !_mcConst3 && !_mcConst4 );
+  if( !(!_mcConst2 && !_mcConst3 && !_mcConst4 ) )
+    assert(0);
 
   std::ofstream fout(fname.Data());
-  assert(fout.is_open());
+  if( !fout.is_open() )
+    assert(0);
   fout << "\\begin{table}[htbH]\n";
   fout << "\\begin{center}\n";
   fout << "\\caption{Energy scale correction factors for individual electrons\n";

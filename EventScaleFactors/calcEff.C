@@ -192,7 +192,7 @@ void calcEff(const TString configFile, const TString effTypeString, const TStrin
   DYTools::TEtaBinSet_t etaBinning = DetermineEtaBinSet(etaBinningString);
   printf("SC eta binning: %s\n", EtaBinSetName(etaBinning).Data());
 
-  int sample;
+  int sample = DYTools::DATA; // Just to have it initialized
   if(sampleTypeString == "DATA")
     sample = DYTools::DATA;
   else if(sampleTypeString == "MC")

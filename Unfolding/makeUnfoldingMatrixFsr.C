@@ -766,7 +766,8 @@ void makeUnfoldingMatrixFsr(const TString input,
   else {
   ifstream ifs;
   ifs.open(input.Data());
-  assert(ifs.is_open());
+  if(!ifs.is_open())
+    assert(0);
   string line;
   Int_t state=0;
   while(getline(ifs,line)) {
@@ -807,7 +808,8 @@ void makeUnfoldingMatrixFsr(const TString input,
   }
 
   TriggerConstantSet constantsSet=DetermineTriggerSet(triggerSetString);  
-  assert ( constantsSet != TrigSet_UNDEFINED );
+  if( ! ( constantsSet != TrigSet_UNDEFINED ) )
+    assert(0);
 
   // For MC the trigger does not depend on run number
   const bool isData=kFALSE;
@@ -816,9 +818,12 @@ void makeUnfoldingMatrixFsr(const TString input,
   PUReweight_t puWeight;
   // For Hildreth method of PU reweighting, the lines below are not needed
 //   if (performPUReweight) {
-//     assert(puWeight.setDefaultFile(dirTag,DYTools::analysisTag_USER, 0));
-//     assert(puWeight.setReference("hNGoodPV_data"));
-//     assert(puWeight.setActiveSample("hNGoodPV_zee"));
+//     if( !(puWeight.setDefaultFile(dirTag,DYTools::analysisTag_USER, 0)) )
+//        assert(0);
+//     if( !(puWeight.setReference("hNGoodPV_data")) )
+//        assert(0);
+//     if( !(puWeight.setActiveSample("hNGoodPV_zee")) )
+//        assert(0);
 //   }
 
   //--------------------------------------------------------------------------------------------------------------

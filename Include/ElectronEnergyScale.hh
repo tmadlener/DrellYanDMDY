@@ -91,12 +91,14 @@ public:
   double generateMCSmear(double eta1, double eta2) const;
   // updated smear (distribution) : one event
   bool addSmearedWeight(TH1F *hMassDestination, int eta1Bin, int eta2Bin, double mass, double weight) const {
-    assert(this->isInitialized());
+    if( !(this->isInitialized()) )
+      assert(0);
     return addSmearedWeightAny(hMassDestination,eta1Bin,eta2Bin,mass,weight,kFALSE);
   }
   // updated smear (distribution) : smear collection
   void smearDistribution(TH1F *destination, int eta1Bin, int eta2Bin, const TH1F *source) const {
-    assert(this->isInitialized());
+    if(!(this->isInitialized()) )
+      assert(0);
     smearDistributionAny(destination,eta1Bin,eta2Bin,source,kFALSE);
   }
 
@@ -112,12 +114,18 @@ public:
   double generateMCSmearRandomized(double eta1, double eta2) const;
   // updated smear (distribution) : one event
   bool addSmearedWeightRandomized(TH1F *hMassDestination, int eta1Bin, int eta2Bin, double mass, double weight) const {
-    assert(this->isInitialized()); assert(this->isSmearRandomized());
+    if( !(this->isInitialized()) )
+      assert(0);
+    if( !(this->isSmearRandomized()) )
+      assert(0);
     return addSmearedWeightAny(hMassDestination,eta1Bin,eta2Bin,mass,weight,kTRUE);
   }
   // updated smear (distribution) : smear collection
   void smearDistributionRandomized(TH1F *destination, int eta1Bin, int eta2Bin, const TH1F *source) const {
-    assert(this->isInitialized()); assert(this->isSmearRandomized());
+    if( !(this->isInitialized()) )
+      assert(0);
+    if( !(this->isSmearRandomized()) )
+      assert(0);
     smearDistributionAny(destination,eta1Bin,eta2Bin,source,kTRUE);
   }
 

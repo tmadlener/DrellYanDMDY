@@ -41,7 +41,8 @@ void calcAcceptanceSystematics(const TString conf){
 
   ifstream ifs;
   ifs.open(conf.Data());
-  assert(ifs.is_open());
+  if( !ifs.is_open())
+    assert(0);
   std::string line;
   int state = 0;
   while(getline(ifs,line)) {

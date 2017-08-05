@@ -119,7 +119,7 @@ void latexPrintoutBackgroundRates1D(TMatrixD observedYields, TMatrixD observedYi
                                     TMatrixD totalBackgroundErrorSyst, TMatrixD bkgRatesUsual, 
                                     TString producedBy)
 {
-   int nValues=3;
+   const int nValues=3;
    TMatrixD* values[nValues];   values[0]=&observedYields; 
    values[1]=&totalBackground; values[2]=&bkgRatesUsual;
    int valuesType[nValues];   valuesType[0]=1;
@@ -160,7 +160,7 @@ void latexPrintoutCrossSection(TMatrixD signalYields      , TMatrixD signalYield
                                                                    TMatrixD absPostFsrCrossSectionSystErrDET,
                                TString  producedBy)
 {
-   int nValues=5;
+   const int nValues=5;
    TMatrixD* values[nValues];       values[0]=&signalYields; 
    values[1]=&unfoldedYields;       values[2]=&effCorrectedYields;
    values[3]=&accCorrectedYields;   values[4]=&preFsrYields;
@@ -292,7 +292,7 @@ void latexPrintoutCrossSectionItself(TMatrixD relCrossSection,
                                      TString  tableName,
                                      TString  producedBy)
 {
-   int nValues=2;
+   const int nValues=2;
 
    TMatrixD* values[nValues];       
    values[0]=&absCrossSection; values[1]=&relCrossSection;    
@@ -332,7 +332,7 @@ void latexPrintoutCrossSectionItself(TMatrixD relCrossSection,
 void latexPrintoutOneValue2D(TMatrixD value, TMatrixD valueErr, TString producedBy, TString valueName, TString baseOfReferenceName, TString tableName)
 {
 
-   int nValues=1;
+   const int nValues=1;
    TMatrixD* values[1];   values[0]=&value;
    int valuesType[1];   valuesType[0]=1;
    TMatrixD* valuesErr1[1];   valuesErr1[0]=&valueErr;
@@ -347,7 +347,7 @@ void latexPrintoutOneValue2D(TMatrixD value, TMatrixD valueErr, TString produced
 void latexPrintoutOneValue1D(TMatrixD value, TMatrixD valueErr, TString producedBy, TString valueName, TString baseOfReferenceName, TString tableName)
 {
  
-   int nValues=1;
+   const int nValues=1;
    TMatrixD* values[1];   values[0]=&value;
    int valuesType[1];   valuesType[0]=1;
    TMatrixD* valuesErr1[1];   valuesErr1[0]=&valueErr;
@@ -395,13 +395,13 @@ void latexPrintoutTwoColumns2D(const int nValues, int* valuesType, TMatrixD** va
    TString str=DayAndTimeTag();
    fprintf(txtFile,"%50s",str.Data());
    TString strComment="% Tables produced by "+ producedBy + " in 2D measurement\n";
-   fprintf(txtFile,strComment);  
+   fprintf(txtFile,"%s",strComment.Data());  
    fprintf(txtFile,"\n\n\n");
    for (int mslice=1; mslice<DYTools::nMassBins; mslice++) 
      {   
        fprintf(txtFile,"\\begin{table}\n");
        TString strHeader="\\caption{\\label{tab:" + baseOfReferenceName+"-%d} " + tableName + "}\n";
-       fprintf(txtFile,strHeader,mslice, DYTools::massBinLimits[mslice], DYTools::massBinLimits[mslice+1] ); 
+       fprintf(txtFile,strHeader.Data(),mslice, DYTools::massBinLimits[mslice], DYTools::massBinLimits[mslice+1] ); 
        fprintf(txtFile,"\\begin{center}\\small{\n");
 
        TString strBeginTabular="\\begin{tabular}[2]{|c|";
@@ -411,7 +411,7 @@ void latexPrintoutTwoColumns2D(const int nValues, int* valuesType, TMatrixD** va
        for (int i=0; i<nValues; i++)
          strBeginTabular+="c|";
        strBeginTabular+="}\n";   
-       fprintf(txtFile,strBeginTabular);
+       fprintf(txtFile,"%s",strBeginTabular.Data());
 
        fprintf(txtFile,"\\hline\n");
 
@@ -428,7 +428,7 @@ void latexPrintoutTwoColumns2D(const int nValues, int* valuesType, TMatrixD** va
            strQuantities+=valuesName[i];       
          } 
        strQuantities +=  " \\\\ \n";      
-       fprintf(txtFile,strQuantities);
+       fprintf(txtFile,"%s",strQuantities.Data());
        fprintf(txtFile,"\\hline\n");
 
        int halfBins=DYTools::nYBins[mslice]/2;
@@ -520,12 +520,12 @@ void latexPrintoutTwoColumns1D(const int nValues, int* valuesType, TMatrixD** va
    TString str=DayAndTimeTag();
    fprintf(txtFile,"%50s",str.Data());
    TString strComment="% Tables produced by "+ producedBy + " in 1D measurement\n";
-   fprintf(txtFile,strComment); 
+   fprintf(txtFile,"%s",strComment.Data()); 
    fprintf(txtFile,"\n"); 
  
    fprintf(txtFile,"\\begin{table}\n");
    TString strHeader="\\caption{\\label{tab:" + baseOfReferenceName+"} " + tableName + "}\n"; 
-   fprintf(txtFile,strHeader); 
+   fprintf(txtFile,"%s",strHeader.Data()); 
    fprintf(txtFile,"\\begin{center}\\small{\n");
 
    TString strBeginTabular="\\begin{tabular}[2]{|c|";
@@ -535,7 +535,7 @@ void latexPrintoutTwoColumns1D(const int nValues, int* valuesType, TMatrixD** va
    for (int i=0; i<nValues; i++)
      strBeginTabular+="c|";
    strBeginTabular+="}\n";   
-   fprintf(txtFile,strBeginTabular);
+   fprintf(txtFile,"%s",strBeginTabular.Data());
 
    fprintf(txtFile,"\\hline\n");
    TString strQuantities = " mass, GeV  ";
@@ -551,7 +551,7 @@ void latexPrintoutTwoColumns1D(const int nValues, int* valuesType, TMatrixD** va
        strQuantities+=valuesName[i];       
      } 
    strQuantities +=  " \\\\ \n";      
-   fprintf(txtFile,strQuantities);
+   fprintf(txtFile,"%s",strQuantities.Data());
 
    fprintf(txtFile,"\\hline\n");
    int halfBins=DYTools::nMassBins/2;
@@ -643,20 +643,20 @@ void latexPrintoutOneColumn2D(const int nValues, int* valuesType, TMatrixD** val
    TString str=DayAndTimeTag();
    fprintf(txtFile,"%50s",str.Data());
    TString strComment="% Tables produced by "+ producedBy + " in 2D measurement\n";
-   fprintf(txtFile,strComment);  
+   fprintf(txtFile,"%s",strComment.Data());  
    fprintf(txtFile,"\n\n\n");
    for (int mslice=0; mslice<DYTools::nMassBins; mslice++) 
      {   
        fprintf(txtFile,"\\begin{table}\n");
        TString strHeader="\\caption{\\label{tab:" + baseOfReferenceName+"-%d} " + tableName + "}\n";
-       fprintf(txtFile,strHeader,mslice, DYTools::massBinLimits[mslice], DYTools::massBinLimits[mslice+1] ); 
+       fprintf(txtFile,strHeader.Data(),mslice, DYTools::massBinLimits[mslice], DYTools::massBinLimits[mslice+1] ); 
        fprintf(txtFile,"\\begin{center}\\small{\n");
 
        TString strBeginTabular="\\begin{tabular}[2]{|c|";
        for (int i=0; i<nValues; i++)
          strBeginTabular+="c|";
        strBeginTabular+="}\n";   
-       fprintf(txtFile,strBeginTabular);
+       fprintf(txtFile,"%s",strBeginTabular.Data());
 
        fprintf(txtFile,"\\hline\n");
 
@@ -667,7 +667,7 @@ void latexPrintoutOneColumn2D(const int nValues, int* valuesType, TMatrixD** val
            strQuantities+=valuesName[i];       
          }   
        strQuantities +=  " \\\\ \n";      
-       fprintf(txtFile,strQuantities);
+       fprintf(txtFile,"%s",strQuantities.Data());
        fprintf(txtFile,"\\hline\n");
 
        for (int j=0; j<DYTools::nYBins[mslice]; j++)
@@ -738,12 +738,12 @@ void latexPrintoutOneColumn1D(const int nValues, int* valuesType, TMatrixD** val
    TString str=DayAndTimeTag();
    fprintf(txtFile,"%50s",str.Data());
    TString strComment="% Tables produced by "+ producedBy + " in 1D measurement\n";
-   fprintf(txtFile,strComment); 
+   fprintf(txtFile,"%s",strComment.Data()); 
    fprintf(txtFile,"\n"); 
  
    fprintf(txtFile,"\\begin{table}\n");
    TString strHeader="\\caption{\\label{tab:" + baseOfReferenceName+"} " + tableName + "}\n"; 
-   fprintf(txtFile,strHeader); 
+   fprintf(txtFile,"%s",strHeader.Data()); 
    fprintf(txtFile,"\\begin{center}\\small{\n");
 
    TString strBeginTabular="\\begin{tabular}[2]{|c|";
@@ -751,7 +751,7 @@ void latexPrintoutOneColumn1D(const int nValues, int* valuesType, TMatrixD** val
      strBeginTabular+="c|";  
    strBeginTabular+="}\n";   
 
-   fprintf(txtFile,strBeginTabular);
+   fprintf(txtFile,"%s",strBeginTabular.Data());
 
    fprintf(txtFile,"\\hline\n");
    TString strQuantities = " mass, GeV  ";
@@ -761,7 +761,7 @@ void latexPrintoutOneColumn1D(const int nValues, int* valuesType, TMatrixD** val
        strQuantities+=valuesName[i];       
      }   
    strQuantities +=  " \\\\ \n";      
-   fprintf(txtFile,strQuantities);
+   fprintf(txtFile,"%s",strQuantities.Data());
 
    fprintf(txtFile,"\\hline\n");
 

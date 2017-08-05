@@ -120,7 +120,8 @@ TString getLabel(int sample, DYTools::TEfficiencyKind_t effType, int method,  DY
   TString label = analysisTag;
   if (analysisTag.Length()>0) label.Append("_");
 
-  assert ( trigSet.isDefined() );
+  if ( !trigSet.isDefined() )
+    assert(0);
   if (sample != -1111) {
     label+= trigSet.triggerSetName();
   }

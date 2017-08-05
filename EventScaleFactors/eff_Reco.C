@@ -99,7 +99,8 @@ void eff_Reco(const TString configFile, const TString effTypeString,
   // fast check
   // Construct the trigger object
   TriggerSelection triggers(triggerSetString, true, 0); // later calls actOnData
-  assert ( triggers.isDefined() );
+  if ( !triggers.isDefined() )
+    assert(0);
 
   if (debugMode) std::cout << "\n\n\tDEBUG MODE is ON\n\n";
 
@@ -140,7 +141,8 @@ void eff_Reco(const TString configFile, const TString effTypeString,
   ifs.open(configFile.Data());
   if (!ifs.is_open()) {
     std::cout << "configFile=" << configFile << "\n";
-    assert(ifs.is_open());
+    if(!ifs.is_open())
+      assert(0);
   }
   string line;
   Int_t state=0;
@@ -222,7 +224,7 @@ void eff_Reco(const TString configFile, const TString effTypeString,
   DYTools::TEtaBinSet_t etaBinning = DetermineEtaBinSet(etaBinningString);
   printf("SC eta binning: %s\n", EtaBinSetName(etaBinning).Data());
 
-  int sample;
+  int sample = DYTools::DATA; // Just to have it initialized here
   printf("Sample: %s\n", sampleTypeString.Data());
   if(sampleTypeString == "DATA")
     sample = DYTools::DATA;
@@ -601,7 +603,7 @@ void eff_Reco(const TString configFile, const TString effTypeString,
 	  // For data, we use the count of good reconstructed vertices
 	  // but for MC, since this will be used for PU reweighting,
 	  // we are using the gen-level number of simulated PU.
-	  if( (sample==DYTools::DATA) ) {
+	  if( sample==DYTools::DATA ) {
 		if (1) {
 		  storeNGoodPV = countGoodVertices(pvArr);
 		}

@@ -140,7 +140,8 @@ void makeUnfoldingMatrix(const TString input,
   else {
   ifstream ifs;
   ifs.open(input.Data());
-  assert(ifs.is_open());
+  if( !ifs.is_open())
+    assert(0);
   string line;
   Int_t state=0;
   while(getline(ifs,line)) {
@@ -181,7 +182,8 @@ void makeUnfoldingMatrix(const TString input,
   }
 
   TriggerConstantSet constantsSet=DetermineTriggerSet(triggerSetString);  
-  assert ( constantsSet != TrigSet_UNDEFINED );
+  if( ! ( constantsSet != TrigSet_UNDEFINED ) )
+    assert(0);
 
   // For MC the trigger does not depend on run number
   const bool isData=kFALSE;

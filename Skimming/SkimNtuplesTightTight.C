@@ -42,7 +42,8 @@ void SkimNtuplesTightTight(const TString input = "skim.input")
   //  
   ifstream ifs;
   ifs.open(input.Data()); 
-  assert(ifs.is_open());
+  if( !ifs.is_open())
+    assert(0);
   string line;
   // First line should be DATA or SIGNALMC or BGMC
   getline(ifs,line); 

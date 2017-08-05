@@ -1,5 +1,6 @@
 #if !defined(__CINT__) || defined(__MAKECINT__)
 #include "../Include/fitFunctionsCore.hh"
+#include "../Include/MyTools.hh"
 #include <RooEffProd.h>
 #endif
 
@@ -32,7 +33,8 @@ struct RealLimit
 };
 
 
-inline int PosOk(size_t pos) { return (pos==std::string::npos) ? 0 : 1; }
+// This function below is defined in MyTools.hh
+//inline int PosOk(size_t pos) { return (pos==std::string::npos) ? 0 : 1; }
 
 // ---------------------------------------------------------
 
@@ -163,8 +165,8 @@ void fitMass(TTree *passTree, TTree *failTree, TString cut, int mode,
 	     const char* setBinsType, TString dirTag){
 
   // meaningless check, saving from compiler complaints
-  if (dirTag.Length() && 0) 
-    std::cout << "fitMass : dirTag=" << dirTag << "\n";
+  // if (dirTag.Length() && 0) 
+  //   std::cout << "fitMass : dirTag=" << dirTag << "\n";
 
   RealLimit lims[19];
 

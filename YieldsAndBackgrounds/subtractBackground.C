@@ -138,7 +138,9 @@ TString subtractBackground(const TString conf,
   int nYBinsMax=DYTools::findMaxYBins();
   //fill out yields matrices from yields.root file
 
-  TString sn[NSamples];
+  // TString sn[NSamples];
+  // Above doesn't work anymore in recent ROOT version, so replace it with simply a large safe number
+  TString sn[1000];
 
   for (int i=0; i<NSamples; i++)
     {
@@ -160,11 +162,14 @@ TString subtractBackground(const TString conf,
   file.Close();
 
 
-  bool doDDvsMCcomparisonTable = true;
+  //
+  // Important switches below: all false for MC backgrounds,
+  //  all true for data driven backgrounds. Data-driven are external inputs!
+  //
+  bool doDDvsMCcomparisonTable = false;
 
-
-  bool useTrue2eBgDataDriven = true;
-  bool useFakeBgDataDriven = true;
+  bool useTrue2eBgDataDriven = false;
+  bool useFakeBgDataDriven = false;
     
   printf("Calculate total backgrounds\n");
   if(useTrue2eBgDataDriven)

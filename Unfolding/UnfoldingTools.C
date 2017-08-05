@@ -167,10 +167,11 @@ int  unfoldFSR(const TVectorD &vin, TVectorD &vout, const TString &unfoldingCons
 
     TVectorD *genF=NULL, *genFErr=NULL;
     TVectorD *recF=NULL, *recFErr=NULL;
-    assert(loadFSRcorrections(correctionsFileName,
+    if(!(loadFSRcorrections(correctionsFileName,
 			      &genF, &genFErr,
 			      &recF, &recFErr,
-			      "unfoldFSR"));
+			    "unfoldFSR")) )
+      assert(0);
 
     // Apply unfolding matrix
     vout = 0;
@@ -219,10 +220,11 @@ int  unfoldFSR(const TVectorD &vin, TVectorD &vout, const TString &unfoldingCons
 
     TVectorD *genF=NULL, *genFErr=NULL;
     TVectorD *recF=NULL, *recFErr=NULL;
-    assert(loadFSRcorrections(correctionsFileName,
+    if( !(loadFSRcorrections(correctionsFileName,
 			      &genF, &genFErr,
 			      &recF, &recFErr,
-			      "unfoldFSRTrueToReco"));
+			     "unfoldFSRTrueToReco")) )
+      assert(0);
 
    // Apply unfolding matrix
    vout = 0;
@@ -369,10 +371,11 @@ int unfoldFSR(const TMatrixD &vinM, TMatrixD &voutM, const TString &unfoldingCon
 
     TVectorD *genF=NULL, *genFErr=NULL;
     TVectorD *recF=NULL, *recFErr=NULL;
-    assert(loadFSRcorrections(correctionsFileName,
-			      &genF, &genFErr,
-			      &recF, &recFErr,
-			      "unfoldFSR"));
+    if( !(loadFSRcorrections(correctionsFileName,
+			     &genF, &genFErr,
+			     &recF, &recFErr,
+			     "unfoldFSR")) )
+      assert(0);
 
     // Apply unfolding matrix
     int nBins = DYTools::getTotalNumberOfBins();
@@ -534,8 +537,9 @@ int unfoldFSR(const TMatrixD &vinM, TMatrixD &voutM, const TString &unfoldingCon
     TVectorD* systOtherSourcesPercentPtr
       = (TVectorD *)fileExtraUnfoldingErrors.FindObjectAny("unfoldingSystPercentFI");
     assert(systOtherSourcesPercentPtr);
-    assert(checkRangesFI(*systOtherSourcesPercentPtr,
-	 TString("unfoldingSystPercent from ") + extraUnfoldingErrorsFileName));
+    if( !(checkRangesFI(*systOtherSourcesPercentPtr,
+			TString("unfoldingSystPercent from ") + extraUnfoldingErrorsFileName)) )
+      assert(0);
 
     // For absolute errors we need to know unfolded yields
     TVectorD yieldsAfterUnfolding(nBins);

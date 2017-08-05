@@ -106,7 +106,8 @@ void prepareYields(const TString conf  = "data_plot.conf",
   //
   ifstream ifs;
   ifs.open(conf.Data());
-  assert(ifs.is_open());
+  if(!ifs.is_open())
+    assert(0);
   string line;
   Int_t state=0;
   while(getline(ifs,line)) {
@@ -166,7 +167,8 @@ void prepareYields(const TString conf  = "data_plot.conf",
   // Set up energy scale corrections
   //
   ElectronEnergyScale escale(escaleTag);
-  assert(escale.isInitialized());
+  if(!escale.isInitialized())
+    assert(0);
   escale.print();
 
   // sOutDir is a static data member in the CPlot class.
@@ -258,9 +260,11 @@ void prepareYields(const TString conf  = "data_plot.conf",
   TH1F *hPVData = 0;
   if (puReweight_new_code) {
     // Do nothing: for the Hildreth method the code commented out below is not needed
-    //     assert(puWeight.setFile(fnamePV));
+    //     if( !puWeight.setFile(fnamePV))
+    //       assert(0);
     //     if (hasData && performPUReweight) {
-    //       assert(puWeight.setReference("hNGoodPV_data"));
+    //       if( !(puWeight.setReference("hNGoodPV_data")) )
+    //         assert(0);
     //     }
   }
   else {
@@ -310,7 +314,8 @@ void prepareYields(const TString conf  = "data_plot.conf",
     if (puReweight_new_code) {
       // Do nothing: for the Hildreth method the code commented out below is not needed
 //       if (performPUReweight) {
-// 	assert(puWeight.setActiveSample(TString("hNGoodPV_")+snamev[isam]));
+// 	if( !(puWeight.setActiveSample(TString("hNGoodPV_")+snamev[isam])) )
+//         assert(0);
 	//puWeight.printActiveDistr_and_Weights(std::cout);
 	//puWeight.printWeights(std::cout);
 //       }
@@ -329,8 +334,9 @@ void prepareYields(const TString conf  = "data_plot.conf",
 
     // Get the TTree and set branch address
     eventTree = (TTree*)infile->Get("Events"); assert(eventTree); 
+    if( !eventTree ){
+    }
     eventTree->SetBranchAddress("Events",&data);
-
 
     TMatrixD *thisSampleYields = yields.at(isam);
     TMatrixD *thisSampleYieldsSumw2 = yieldsSumw2.at(isam);

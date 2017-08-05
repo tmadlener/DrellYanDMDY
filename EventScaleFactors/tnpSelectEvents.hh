@@ -217,7 +217,8 @@ int CreatePUWeightedBranch(const TString &fName,
   }
 
   TFile *selectedEventsFile= new TFile(fName,"UPDATE");
-  assert(selectedEventsFile && selectedEventsFile->IsOpen());
+  if( !(selectedEventsFile && selectedEventsFile->IsOpen()) )
+    assert(0);
   //std::cout << "selectedEventsFile tree entry counts: " << ((TTree*)selectedEventsFile->Get("passTree"))->GetEntries() << ", " << ((TTree*)selectedEventsFile->Get("failTree"))->GetEntries() << "\n";
 
   // first accumulate the PU distribution
@@ -226,7 +227,8 @@ int CreatePUWeightedBranch(const TString &fName,
     TString pass_fail_str= (fail) ? "_fail" : "_pass";
     TString treeName= (fail) ? "failTree" : "passTree";
     // get the tree
-    TTree *tree = (TTree*)selectedEventsFile->Get(treeName); assert(tree);
+    TTree *tree = (TTree*)selectedEventsFile->Get(treeName); 
+    assert(tree);
     // set addresses 
     double evWeight;
     UInt_t nGoodPV;
@@ -234,7 +236,8 @@ int CreatePUWeightedBranch(const TString &fName,
     tree->SetBranchAddress("nGoodPV",&nGoodPV);
     TBranch *evWeightBr= tree->GetBranch("eventWeight");
     TBranch *pvCountBr= tree->GetBranch("nGoodPV");
-    assert(evWeightBr && pvCountBr);
+    assert(evWeightBr);
+    assert(pvCountBr);
 
   }
 
@@ -243,7 +246,8 @@ int CreatePUWeightedBranch(const TString &fName,
     TString pass_fail_str= (fail) ? "_fail" : "_pass";
     TString treeName= (fail) ? "failTree" : "passTree";
     // get the tree
-    TTree *tree = (TTree*)selectedEventsFile->Get(treeName); assert(tree);
+    TTree *tree = (TTree*)selectedEventsFile->Get(treeName); 
+    assert(tree);
     // set addresses and create a new branch
     double evWeight,pvWeight;
     UInt_t nGoodPV;
@@ -253,7 +257,9 @@ int CreatePUWeightedBranch(const TString &fName,
     TBranch *evWeightBr= tree->GetBranch("eventWeight");
     TBranch *pvCountBr= tree->GetBranch("nGoodPV");
     TBranch *weightBr= tree->GetBranch("weight");
-    assert(evWeightBr && pvCountBr && weightBr);
+    assert(evWeightBr);
+    assert(pvCountBr);
+    assert(weightBr);
 
     // fill the weight branch
     for (UInt_t i=0; i<tree->GetEntries(); ++i) {

@@ -8,10 +8,13 @@ PUReweight_t::PUReweight_t(TReweightMethod_t method):
   hActive(NULL), hWeight(NULL), FCreate(0),
   FActiveMethod(method)
 {
-
+  int result = 0;
   switch(method) {
   case _none: break;
-  case _Hildreth: assert(initializeHildrethWeights()); break;
+  case _Hildreth: 
+    result = initializeHildrethWeights();
+    assert(result); 
+    break;
   case _TwoHistos:
     std:: cout << "\nERROR: PUReweight constructor cannot be called with method _TwoHistos. Use method _none and setup the histograms by other methods\n";
     assert(0);
@@ -145,10 +148,10 @@ int PUReweight_t::initializeHildrethWeights(){
   f2.Close();
 
   FActiveMethod=_Hildreth;
-//   printf("Pileup weights for the Hildreth method are constructed.\n");
-//   for(int i=1; i<= hWeightHildreth->GetNbinsX(); i++){
-//     printf("PU=%2d  weight=%f\n", i, hWeightHildreth->GetBinContent(i));
-//   }
+  // printf("Pileup weights for the Hildreth method are constructed.\n");
+  // for(int i=1; i<= hWeightHildreth->GetNbinsX(); i++){
+  //   printf("PU=%2d  weight=%f\n", i, hWeightHildreth->GetBinContent(i));
+  // }
   return 1;
 }
 
@@ -251,7 +254,8 @@ int PUReweight_t::setSimpleWeights(const TString &targetFile,
   f1.Close(); 
   f2.Close();
 
-  assert(initializeTwoHistoWeights(hTarget,hSource));
+  if( !initializeTwoHistoWeights(hTarget,hSource))
+    assert(0);
   return 1;
 }
 
@@ -331,7 +335,8 @@ int PUReweight_t::prepareWeights(int save_weight) {
   }
   
   FActiveMethod=_TwoHistos;
-  assert(initializeTwoHistoWeights(hRef,hActive));
+  if( !initializeTwoHistoWeights(hRef,hActive))
+    assert(0);
 
   if (save_weight) {
     if (FCreate!=0) { FFile->cd(); hWeight->Write(); }

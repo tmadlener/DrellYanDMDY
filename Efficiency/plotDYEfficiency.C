@@ -94,7 +94,8 @@ void plotDYEfficiency(const TString input,
   else {
   ifstream ifs;
   ifs.open(input.Data());
-  assert(ifs.is_open());
+  if(!ifs.is_open())
+    assert(0);
   string line;
   Int_t state=0;
   while(getline(ifs,line)) {
@@ -273,11 +274,13 @@ void plotDYEfficiency(const TString input,
 
       const bool isData=kFALSE;
       TriggerConstantSet constantsSet = DetermineTriggerSet(triggerSetString);
-      assert ( constantsSet != TrigSet_UNDEFINED );
+      if( ! ( constantsSet != TrigSet_UNDEFINED ) )
+	assert(0);
 
       // Construct the trigger object
       TriggerSelection requiredTriggers(constantsSet, isData, info->runNum);
-      assert(requiredTriggers.isDefined());
+      if(!requiredTriggers.isDefined())
+	assert(0);
 
       // The statements below are commented out: now trigger bit cuts are done
       // in TriggerSelection

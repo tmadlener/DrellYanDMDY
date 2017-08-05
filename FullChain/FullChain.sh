@@ -50,32 +50,54 @@ clear_old_logs=0
 force_rebuild_include_files=0
 
 
-
+#
+# ==== Primary flags that control which setps of analysis flow to run ===
+#
 # individual flags. 
 # Note: all the above flags have to be 0 for these individual flags 
 # to be effective
-do_selection=1
-do_prepareYields=1
-do_subtractBackground=1
-do_unfolding=0
-do_unfoldingFsr=1
-do_unfoldingSyst=0    # long calculation!  (also, some steps are skipped)
-do_acceptance=1
-do_acceptanceSyst=1
-do_efficiency=1
-do_plotFSRCorrections=1
-do_plotFSRCorrectionsSansAcc=1
-do_setupTheory=1
-do_crossSection=0
-do_crossSectionFsr=1
-do_plotXSec=1
+do_selection=1          # Necessary for simplest x-sec
+do_prepareYields=1      # Necessary for simplest x-sec
+do_subtractBackground=1 # Necessary for simplest x-sec, flags to use MC or data-drive are set inside subtractBackgrounds.C
+do_unfoldingFsr=1       # Necessary for simplest x-sec
+do_unfoldingSyst=1      # Can be skipped, long calculation!, see below about dummy systematics
+do_escaleSystematics=1  # Can be skipped, very long calculation! but see dummy systematics below
+do_acceptance=1         # Necessary for simplest x-sec
+do_acceptanceSyst=1     # Can be skipped, see below about dummy systematics
+do_efficiency=1         # Necessary for simplest x-sec
+do_efficiencyScaleFactors=1 # Necessary for simplest x-sec, LONG, check EventScaleFactors/*sh script settings!
+do_plotFSRCorrections=1 # Necessary for simplest x-sec
+do_plotFSRCorrectionsSansAcc=1 # Necessary for simplest x-sec
+do_setupTheory=1        # Necessary for simplest x-sec
+do_crossSectionFsr=1    # Necessary for simplest x-sec
+do_plotXSec=1           # Necessary for simplest x-sec
 
-#          check EventScaleFactors/*sh script settings! 
-#          long calculation!
-do_efficiencyScaleFactors=1
 
-do_escaleSystematics=1  # very long calculation!
+# Dummy systematics. When one wishes to not spend time O(day) to compute
+# all systematics, one may want to create necessary root files that compute
+# all zeroes for the systematic values, the root files that are required
+# for the cross section calculation. To do that:
+#   1) Go to directory Acceptance, execute
+#       root -b -q createDummyAcceptanceSystematics.C+\(\"../config_files/xsecCalc8TeV.conf\"\)
+#   2) Go to directory Unfolding, execute
+#       root -b -q createDummyUnfoldingSystematics.C+\(\"../config_files/xsecCalc8TeV.conf\"\)
+#   3) Go to directory Unfolding again, execute
+#       root -b -q createDummyEscaleSystematics.C+
+# This is assuming that the variable filename_cs in this script above is set to this "../config_files/xsecCalc8TeV.conf"
+# Next, go to the directory root_files/systematics/{dirTag}, where {dirTag} is set in that xsecCalc8TeV.conf,
+# and is presently equal to "DY_j22_19712pb". So the full name of the directory with systematics
+# is "root_files/systematics/DY_j22_19712pb/". After the above (1)-(3) there are now
+# acceptance, unfolding, and e-scale systematic files named "......_dummy.root". Rename them
+# to drop "_dummy" from the name. This is it. Now one can run the "do_crossSectionFsr" step 
+# and it will be using this dummy/zero systematics.
 
+# These scripts are from older times, they do not need to be used in 2017
+do_unfolding=0          # Old style script, superceeded, do not use.
+do_crossSection=0       # Old style script, superceeded, do not use.
+
+#
+# ==== End of primary flags that control which setps of analysis flow to run ===
+#
 
 # Determine whether it is 1D or 2D case
 chkDYTools=`grep study2D=0 ../Include/DYTools.hh`

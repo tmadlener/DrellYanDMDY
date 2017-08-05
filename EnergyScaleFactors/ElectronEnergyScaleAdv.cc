@@ -2184,9 +2184,12 @@ int ElectronEnergyScaleAdv_t::ProcessEEMFileApproximateMCWeight(const char *mc_f
 
   PUReweight_t puWeight;
   if (performPUReweight) {
-    assert(puWeight.setDefaultFile("DY_m10+pr+a05+o03+pr_4839pb","", 0));
-    assert(puWeight.setReference("hNGoodPV_data"));
-    assert(puWeight.setActiveSample("hNGoodPV_zee"));
+    if( !puWeight.setDefaultFile("DY_m10+pr+a05+o03+pr_4839pb","", 0))
+      assert(0);
+    if( !puWeight.setReference("hNGoodPV_data"))
+      assert(0);
+    if( !(puWeight.setActiveSample("hNGoodPV_zee")) )
+      assert(0);
   }
 
   EtaEtaMassData_t *eem = new EtaEtaMassData_t();

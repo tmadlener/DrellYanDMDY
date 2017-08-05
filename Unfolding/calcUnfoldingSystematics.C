@@ -16,7 +16,7 @@ using std::stringstream;
 // The global variables will be used in several functions:
 TString tagDirYields = "";
 TString tagDirConstants = "";
-Double_t lumi = 0;
+Double_t luminosity = 0;
 
 // load in flat index format
 int readData(const TString &fname, TVectorD &vFI, TVectorD &vErr1FI, 
@@ -55,13 +55,14 @@ void calcUnfoldingSystematics(const TString conf){
 
   ifstream ifs;
   ifs.open(conf.Data());
-  assert(ifs.is_open());
+  if(!ifs.is_open())
+    assert(0);
   string line;
   int state = 0;
   while(getline(ifs,line)) {
     if(line[0]=='#') continue;
     if(state==0){
-      stringstream ss1(line); ss1 >> lumi;
+      stringstream ss1(line); ss1 >> luminosity;
       state++;
     }else if(state==1){
       tagDirYields = TString(line);

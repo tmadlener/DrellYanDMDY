@@ -107,7 +107,8 @@ void selectEmuEvents(const TString conf,
   //
   ifstream ifs;
   ifs.open(conf.Data());
-  assert(ifs.is_open());
+  if(!ifs.is_open())
+    assert(0);
   string line;
   Int_t state=0;
   while(getline(ifs,line)) {
@@ -167,7 +168,8 @@ void selectEmuEvents(const TString conf,
   // Set up energy scale corrections
   //
   ElectronEnergyScale escale(escaleTag);
-  assert(escale.isInitialized());
+  if(!escale.isInitialized())
+    assert(0);
   escale.print();
 
 
@@ -285,7 +287,8 @@ void selectEmuEvents(const TString conf,
   if (dump_events) {
     printf("Checking that file can be written: %s\n",evtfname);
     evtfile.open(evtfname);
-    assert(evtfile.is_open());
+    if(!evtfile.is_open())
+      assert(0);
   }
   
   //
@@ -587,7 +590,8 @@ void selectEmuEvents(const TString conf,
 	      nGoodPV++;
 	    }
 #ifdef usePUReweight
-	    assert(puReweight.Fill(nGoodPV,weight));
+	    if(!puReweight.Fill(nGoodPV,weight))
+	      assert(0);
 #else
 	    hNGoodPVv[isam]->Fill(nGoodPV,weight);
 #endif
@@ -728,7 +732,8 @@ void selectEmuEvents(const TString conf,
   char txtfname[100];    
   sprintf(txtfname,"%s/summary.txt",outputDir.Data());
   txtfile.open(txtfname);
-  assert(txtfile.is_open());
+  if(!txtfile.is_open())
+    assert(0);
   txtfile << "*" << endl;
   txtfile << "* SUMMARY" << endl;
   txtfile << "*--------------------------------------------------" << endl;

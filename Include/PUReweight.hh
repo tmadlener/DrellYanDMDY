@@ -47,7 +47,10 @@ public:
     switch(method) {
     case _none: ; break;
     case _Hildreth: 
-      if (!hWeightHildreth) assert(initializeHildrethWeights());
+      if (!hWeightHildreth){
+	if( !(initializeHildrethWeights()) )
+	  assert(0);
+      }
       break;
     case _TwoHistos: ; break; // RecoLevel initialization cannot be done here
     default:

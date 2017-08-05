@@ -109,7 +109,8 @@ inline
 TH1F* readTh(TVectorD &v, TVectorD &vErr, const TriggerSelection &triggers, DYTools::TCrossSectionKind_t theKind, int iMassBin, int useFEWZ, int extraFlag){
 
   v=0; vErr=0;
-  assert(triggers.isDefined()); // get rid of compiler complaint
+  if( !(triggers.isDefined()) )
+    assert(0); // get rid of compiler complaint
 
   //printf("Load data yields\n"); fflush(stdout);
   //TFile fileXsecTh   (TString("../root_files/xSecTh_results.root"));
