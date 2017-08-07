@@ -69,3 +69,155 @@ print out the summary of whether the requested steps of the analysis succeeded o
 
 The script has been tested on lxplus with ROOT 6.06 (e.g. available if one does setenv in CMSSW_8_X_X 
 or later).
+
+## Output of different steps of the analysis flow
+
+The overall formula for a typical (and our) cross section calculation
+```
+    sigma = Unfold_in_M_and_Y ( N_selected_data - N_background) / ( Acceptance * Efficiency * Eff_scale_Factors * Luminosity)
+```
+Note on binning: the 2D measurement with respect to (M, Y) is set up to have equal size bins
+    in rapidity, but arbitrary bin sizes in mass. Additionally, the rapidity bins have to be equal
+    size, for each mass range, but one can have different number of rapidity bins for different
+    mass ranges. For example, for 20<M<30 one can have 24 rapidity bins, and for 30<M<40
+    one can have 12 mass bins. 
+
+For the steps "prepare yields" and "subtract backgrounds" the results a matrices of yields
+stored in ROOT files with similar structure. The "yields" part is explained below in detail:
+
+```
+    root_files/yields/DY_j22_19712pb/yields2D.root
+```
+      This file contains:
+        1) Binning info for consistency checking:
+```
+                 TVectorT<double> massBinLimits
+                 TVectorT<double> rapidityCounts
+```
+          As the name suggests, the limits of mass bins, and then number of rapidity
+          bins for each mass bin.
+        2) The yields in TMatrix form for the observed in data event counts yields_data
+          as well as yields observed in all MC samples: yields_zee is signal MC, and the
+          rest like yields_wjets, yields_qcd, etc, are backgrounds. Note that the MC yields
+          are already contain proper pile-up, luminosity and cross section weighting.
+          (however there is no scale factor corrections at this stage).
+        3) The TMatrix objects for each case above with sum of weights squared 
+           (the error on the yield in a given bin is sqrt(sumw^2), so it is the squares of errrors).
+           The matrix names are yieldsSumw2_xxx where xxx is the sample type.
+       One can open the file and quickly view the content by doing executing .ls first to see
+        the list of available objects, and then printing them, like yields_data->Print() interactively.
+
+```
+    root_files/yields/DY_j22_19712pb/yields_plots2D.root
+```
+       This file contains a number of plots. For a 2D cross section, the spectra of rapidity
+      are drawn separately for each mass range, data with MC overlaid, in two normalizations:
+      in each mass range total MC is normalized to have the same area for that mass range,
+      and also in each mass range the same normalization is applied so that the Z peak area
+      is the same for data and MC.
+          Additionally, there is a "flattened" plot in which both mass and rapidity is represented
+      along one axis. There are a few more useful plots there.
+
+```
+    YieldsAndBackgrounds/plots2D/
+```
+        The directory contains plots in png, pdf, root formats, of the type described above.
+
+```
+    YieldsAndBackgrounds/tables2D/
+```
+        The directory contains tables of yields in text/latex format suitable for pasting into
+      an Analysis Note.
+  
+The output of the "subtract backgrounds" is similar to the above, a bit smaller in scope:
+
+```
+     root_files/yields/DY_j22_19712pb/yields_bg-subtracted2D.root
+```
+          This file contains the binning info for consistency checking again massBinLimits
+          and rapidityCounts, as well as the background subtracted yields. There are three
+          matrices:
+```
+            TMatrixT<double> YieldsSignal
+            TMatrixT<double> YieldsSignalErr
+            TMatrixT<double> YieldsSignalSystErr
+```
+          The first error is statistical, the second is systematic as the name suggests.
+          These are errors, nor error squares like it was for the "yields" part.
+
+```
+     root_files/yields/DY_j22_19712pb/yields_bg-subtracted2D-plots.root
+```
+        This file contains a few simple plots, not as useful as the "yields" plots
+
+```
+    YieldsAndBackgrounds/plots2D/
+    YieldsAndBackgrounds/tables2D/
+```
+          These are same as above, for the "yields" step of the workflow. The tables and
+          plots from both steps are found here.
+
+For the steps "acceptance", "efficiency", "event scale factors", the result is constants
+that will be applied in the final cross section calculation. The constants are stored
+in ROOT files for later use. There are also plots to look at. The structure is the same
+for all of these steps. Let me explain with the "acceptance" step:
+
+```
+   root_files/constants/DY_j22_19712pb/acceptance_constants2D.root
+```
+       This file contains:
+          1) Binning info for consistency checking:
+```
+                 TVectorT<double> massBinLimits
+                 TVectorT<double> rapidityCounts
+```
+              These arrays contain, as the name suggests, the limits of mass bins, and then number of rapidity
+              bins for each mass bin.
+          2) The acceptance corrections themselves:
+```
+                TMatrixT<double> acceptanceMatrix
+                TMatrixT<double> acceptanceErrMatrix
+```
+              These are matrices with the acceptance constants and errors on them (errors from MC statistics)
+               for all mass/rapidity bins.
+           One can easily see the content by simply opening this root file and
+           running commands like acceptanceMatrix->Print() interactively.
+
+```
+     root_files/constants/DY_j22_19712pb/acceptance_plots2D.root
+```
+          This file contains a canvas with the acceptance correction plot in 2D. One can open it
+          and execute acceptance->Draw() to see the plot.
+
+```
+     Acceptance/plots2D/
+```
+            Here one can find acceptance and related plots in png, pdf, root format. 
+
+```
+     Acceptance/tables2D/
+```
+            In this directory, one can find tables of acceptance constants in latex format, suitable
+            for an Analysis Note.
+
+     The steps "efficiency" and "event scale factors" result in a similar outcome, the relevant
+     locations/names are:
+
+Efficiency: (no binning arrays saved here, only the corrections themselves)
+```
+ root_files/constants/DY_j22_19712pb/event_efficiency_constants2D.root
+ root_files/constants/DY_j22_19712pb/event_efficiency_plots2D.root 
+ Efficiency/plots2D/
+ Efficiency/tables2D/
+```
+
+Event scale factors:
+```
+  root_files/constants/DY_j22_19712pb/scale_factors_2D_Full2012_hltEffOld_PU.root
+  root_files/constants/DY_j22_19712pb/scale_factors_2D_Full2012_hltEffOld_PU-plots.root
+  EventScaleFactors/plots2D_PU/
+```
+Above in the first file, the ROOT file with constants, there are not only mass and rapidity binnings
+for consistency checking, but also single electron pt and eta binning that tells us what was
+used when running tag-and-probe to find single electron efficiencies for scale factors.
+    
