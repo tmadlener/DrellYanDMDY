@@ -57,20 +57,20 @@ force_rebuild_include_files=0
 # Note: all the above flags have to be 0 for these individual flags 
 # to be effective
 do_selection=1          # Necessary for simplest x-sec
-do_prepareYields=1      # Necessary for simplest x-sec
-do_subtractBackground=1 # Necessary for simplest x-sec, flags to use MC or data-drive are set inside subtractBackgrounds.C
-do_unfoldingFsr=1       # Necessary for simplest x-sec
-do_unfoldingSyst=1      # Can be skipped, long calculation!, see below about dummy systematics
-do_escaleSystematics=1  # Can be skipped, very long calculation! but see dummy systematics below
-do_acceptance=1         # Necessary for simplest x-sec
-do_acceptanceSyst=1     # Can be skipped, see below about dummy systematics
-do_efficiency=1         # Necessary for simplest x-sec
-do_efficiencyScaleFactors=1 # Necessary for simplest x-sec, LONG, check EventScaleFactors/*sh script settings!
-do_plotFSRCorrections=1 # Necessary for simplest x-sec
-do_plotFSRCorrectionsSansAcc=1 # Necessary for simplest x-sec
-do_setupTheory=1        # Necessary for simplest x-sec
-do_crossSectionFsr=1    # Necessary for simplest x-sec
-do_plotXSec=1           # Necessary for simplest x-sec
+do_prepareYields=0      # Necessary for simplest x-sec
+do_subtractBackground=0 # Necessary for simplest x-sec, flags to use MC or data-drive are set inside subtractBackgrounds.C
+do_unfoldingFsr=0       # Necessary for simplest x-sec
+do_unfoldingSyst=0      # Can be skipped, long calculation!, see below about dummy systematics
+do_escaleSystematics=0  # Can be skipped, very long calculation! but see dummy systematics below
+do_acceptance=0         # Necessary for simplest x-sec
+do_acceptanceSyst=0     # Can be skipped, see below about dummy systematics
+do_efficiency=0         # Necessary for simplest x-sec
+do_efficiencyScaleFactors=0 # Necessary for simplest x-sec, LONG, check EventScaleFactors/*sh script settings!
+do_plotFSRCorrections=0 # Necessary for simplest x-sec
+do_plotFSRCorrectionsSansAcc=0 # Necessary for simplest x-sec
+do_setupTheory=0        # Necessary for simplest x-sec
+do_crossSectionFsr=0    # Necessary for simplest x-sec
+do_plotXSec=0           # Necessary for simplest x-sec
 
 
 # Dummy systematics. When one wishes to not spend time O(day) to compute
