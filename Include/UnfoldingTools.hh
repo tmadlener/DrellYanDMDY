@@ -68,23 +68,23 @@ namespace unfolding{
  
   int checkBinningConsistency(const TString &fileName);
 
-  //  convert m[nMassBins][ybins] -> v[flat_idx]
+  //  convert m[nMassBins][pTbins] -> v[flat_idx]
   int flattenMatrix(const TMatrixD &m, TVectorD &v) {
     for (int i=0; i<DYTools::nMassBins; ++i) {
-      for (int yi=0; yi<DYTools::nYBins[i]; ++yi) {
-	int flatIdx=DYTools::findIndexFlat(i,yi);
-	v[flatIdx]=m[i][yi];
+      for (int pTi=0; pTi<DYTools::npTBins[i]; ++pTi) {
+	int flatIdx=DYTools::findIndexFlat(i,pTi);
+	v[flatIdx]=m[i][pTi];
       }
     }
     return 1;
   }
 
-  //  convert v[flat_idx] -> m[nMassBins][ybins]
+  //  convert v[flat_idx] -> m[nMassBins][pTbins]
   int deflattenMatrix(const TVectorD &v, TMatrixD &m) {
     for (int i=0; i<DYTools::nMassBins; ++i) {
-      for (int yi=0; yi<DYTools::nYBins[i]; ++yi) {
-	int flatIdx=DYTools::findIndexFlat(i,yi);
-	m[i][yi]=v[flatIdx];
+      for (int pTi=0; pTi<DYTools::npTBins[i]; ++pTi) {
+	int flatIdx=DYTools::findIndexFlat(i,pTi);
+	m[i][pTi]=v[flatIdx];
       }
     }
     return 1;
@@ -99,7 +99,7 @@ namespace unfolding{
   // assume Vector[flat_index]
   bool checkRangesFI(const TVectorD &M, const TString &name, int verb=1);
 
-  // check that mass and rapidityCounts match massBinLimits and nYBins
+  // check that mass and rapidityCounts match massBinLimits and npTBins
   bool checkBinningRanges(const TVectorD &mass, const TVectorD &rapidityCounts, const TString &fname);
 
   // check that the vectors have totalNumberOfBins elements

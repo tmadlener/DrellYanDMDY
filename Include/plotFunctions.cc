@@ -106,7 +106,7 @@ void PlotMatrixVariousBinning(const TMatrixD &matr, TString name,
 
    TString histName = "Hist" + name;
    TH2D* Hist= new TH2D(histName,title, nM, DYTools::massBinLimits, nY, 
-			DYTools::yRangeMin, DYTools::yRangeMax);
+			DYTools::pTRangeMin, DYTools::pTRangeMax);
    Hist->SetDirectory(0);
    for (int i=0; i<nM; i++)
      for (int j=0; j<nY; j++)
@@ -170,8 +170,8 @@ TMatrixD AdjustMatrixBinning(const TMatrixD &matrUsualBinning)
   TMatrixD matrOut(DYTools::nMassBins,minMutualMultiple());
   for (int i=0; i<DYTools::nMassBins; i++)
     {
-      int nTheSameCells=minMutualMultiple()/DYTools::nYBins[i];
-      for (int j=0; j<DYTools::nYBins[i]; j++)
+      int nTheSameCells=minMutualMultiple()/DYTools::npTBins[i];
+      for (int j=0; j<DYTools::npTBins[i]; j++)
         for (int l=0; l<nTheSameCells; l++)          
            matrOut(i,j*nTheSameCells+l)=matrUsualBinning(i,j); 
 
@@ -183,10 +183,10 @@ TMatrixD AdjustMatrixBinning(const TMatrixD &matrUsualBinning)
 
 Int_t minMutualMultiple()
 {
-  int mult=DYTools::nYBins[0];
+  int mult=DYTools::npTBins[0];
   for (int i=1; i<DYTools::nMassBins; i++)
   {
-    mult=minMutualMultipleTwo(mult,DYTools::nYBins[i]);
+    mult=minMutualMultipleTwo(mult,DYTools::npTBins[i]);
 
   }
   return mult;
@@ -249,25 +249,25 @@ TMatrixD relPostFsrCrossSectionDET, TMatrixD relPostFsrCrossSectionStatErrDET)
      }
    else if (DYTools::study2D==1)
      {
-       x  = new double[DYTools::nYBinsMax];
-       ex = new double[DYTools::nYBinsMax];       
-       y1  = new double[DYTools::nYBinsMax];
-       ey1 = new double[DYTools::nYBinsMax];
-       y2  = new double[DYTools::nYBinsMax];
-       ey2 = new double[DYTools::nYBinsMax];
-       y3  = new double[DYTools::nYBinsMax];
-       ey3 = new double[DYTools::nYBinsMax];
-       y4  = new double[DYTools::nYBinsMax];
-       ey4 = new double[DYTools::nYBinsMax];
+       x  = new double[DYTools::npTBinsMax];
+       ex = new double[DYTools::npTBinsMax];       
+       y1  = new double[DYTools::npTBinsMax];
+       ey1 = new double[DYTools::npTBinsMax];
+       y2  = new double[DYTools::npTBinsMax];
+       ey2 = new double[DYTools::npTBinsMax];
+       y3  = new double[DYTools::npTBinsMax];
+       ey3 = new double[DYTools::npTBinsMax];
+       y4  = new double[DYTools::npTBinsMax];
+       ey4 = new double[DYTools::npTBinsMax];
 
         for (int i=0; i<DYTools::nMassBins; i++)
          {
-           n = DYTools::nYBins[i];
-           for (int j=0; j<DYTools::nYBins[i]; j++)
+           n = DYTools::npTBins[i];
+           for (int j=0; j<DYTools::npTBins[i]; j++)
              {
-               x[j]=DYTools::yRangeMin+
-		 (j+0.5)*(DYTools::yRangeMax-DYTools::yRangeMin)/n;
-               ex[j]=0.5*(DYTools::yRangeMax-DYTools::yRangeMin)/n;
+               x[j]=DYTools::pTRangeMin+
+		 (j+0.5)*(DYTools::pTRangeMax-DYTools::pTRangeMin)/n;
+               ex[j]=0.5*(DYTools::pTRangeMax-DYTools::pTRangeMin)/n;
                y1[j]=relCrossSection(i,j); 
                ey1[j]=relCrossSectionStatErr(i,j);
                y2[j]=relCrossSectionDET(i,j);
@@ -542,7 +542,7 @@ void DrawFlattened(vector<TMatrixD*> yields, vector<TMatrixD*> yieldsSumw2, vect
     TMatrixD *thisSampleYields = yields.at(isam);
     TMatrixD *thisSampleYieldsSumw2 = yieldsSumw2.at(isam);
     for(int im = 0; im < DYTools::nMassBins; im++){
-      for(int iy = 0; iy < DYTools::nYBins[im]; iy++){
+      for(int iy = 0; iy < DYTools::npTBins[im]; iy++){
 	int iflat = DYTools::findIndexFlat(im, iy);
 	hFlattened[isam]->SetBinContent(iflat, (*thisSampleYields)(im,iy) );
 	hFlattened[isam]->SetBinError(iflat, sqrt((*thisSampleYieldsSumw2)(im,iy)) );
@@ -622,10 +622,10 @@ void Draw6Canvases(vector<TMatrixD*> yields, vector<TMatrixD*> yieldsSumw2,
       mcHists[i]=new THStack(stackName,"");
       TString totalMcName="totalMC-" + normStr;
       totalMcName+=i;
-      totalMc[i]=new TH1F(totalMcName,"",DYTools::nYBins[i],DYTools::yRangeMin,DYTools::yRangeMax); 
+      totalMc[i]=new TH1F(totalMcName,"",DYTools::npTBins[i],DYTools::pTRangeMin,DYTools::pTRangeMax); 
       TString ewkName="ewk-" + normStr;
       ewkName+=i;
-      ewkHist[i]=new TH1F(ewkName,"",DYTools::nYBins[i],DYTools::yRangeMin,DYTools::yRangeMax);
+      ewkHist[i]=new TH1F(ewkName,"",DYTools::npTBins[i],DYTools::pTRangeMin,DYTools::pTRangeMax);
 
 
       // add entries taking into accout that the order will be reversed
@@ -635,13 +635,13 @@ void Draw6Canvases(vector<TMatrixD*> yields, vector<TMatrixD*> yieldsSumw2,
         {
           TString histName="hist-" + normStr;
           histName+=i; histName+="-"; histName+=j; 
-          allHists[i][j]=new TH1F(histName,"",DYTools::nYBins[i],DYTools::yRangeMin,DYTools::yRangeMax);
-          //nYBins, YRangeMin, yRangeMax - from DYTools.hh
+          allHists[i][j]=new TH1F(histName,"",DYTools::npTBins[i],DYTools::pTRangeMin,DYTools::pTRangeMax);
+          //npTBins, pTRangeMin, pTRangeMax - from DYTools.hh
 
           TMatrixD *thisSampleYields = yields.at(j);
           TMatrixD *thisSampleYieldsSumw2 = yieldsSumw2.at(j);
 
-          for (int k=0; k<DYTools::nYBins[i]; k++)
+          for (int k=0; k<DYTools::npTBins[i]; k++)
           // loop over allHists bins
             {
               allHists[i][j]->SetBinContent(k+1,(*thisSampleYields)(i,k));
@@ -856,13 +856,13 @@ void Draw6Canvases(vector<TMatrixD*> yields, vector<TMatrixD*> yieldsSumw2,
       ratioHist[i]->SetLineWidth(1);
       ratioHist[i]->SetMarkerSize(1.0);
     
-      double ymin = -0.7;
-      double ymax = 0.7;
+      double pTMin = -0.7;
+      double pTMax = 0.7;
       if(i == 6){
-	ymin = -1.5;
-	ymax = 1.5;
+	pTMin = -1.5;
+	pTMax = 1.5;
       }
-      ratioHist[i]->GetYaxis()->SetRangeUser(ymin,ymax);
+      ratioHist[i]->GetYaxis()->SetRangeUser(pTMin,pTMax);
       ratioHist[i]->GetYaxis()->SetNdivisions(3);
       ratioHist[i]->GetYaxis()->SetLabelSize(0.15);
       ratioHist[i]->GetYaxis()->SetTitle("(data-MC)/data");
@@ -1043,8 +1043,8 @@ void PlotMatrixMYSlices(const std::vector<int> &indices, int functionOfRapidity,
     throw 2;
   }
   int nY=matrV[0].GetNcols();
-  if (nY!=DYTools::nYBinsMax) {
-    std::cout << "PlotMatrixMYSlices: nN!=DYTools::nYBinsMax" << std::endl;
+  if (nY!=DYTools::npTBinsMax) {
+    std::cout << "PlotMatrixMYSlices: nN!=DYTools::npTBinsMax" << std::endl;
     throw 2;
   }
   for (unsigned int i=0; i<matrV.size(); ++i) {
@@ -1053,7 +1053,7 @@ void PlotMatrixMYSlices(const std::vector<int> &indices, int functionOfRapidity,
       throw 2;
     }
     if (nY!=matrV[i].GetNcols()) {
-      std::cout << "PlotMatrixMYSlices: matrV[" << i << "].GetNcols!=DYTools::nYBinsMax" << std::endl;
+      std::cout << "PlotMatrixMYSlices: matrV[" << i << "].GetNcols!=DYTools::npTBinsMax" << std::endl;
       throw 2;
     }
   }
@@ -1063,7 +1063,7 @@ void PlotMatrixMYSlices(const std::vector<int> &indices, int functionOfRapidity,
       throw 2;
     }
     if (nY!=matrErrV[i].GetNcols()) {
-      std::cout << "PlotMatrixMYSlices: matrErrV[" << i << "].GetNcols!=DYTools::nYBinsMax" << std::endl;
+      std::cout << "PlotMatrixMYSlices: matrErrV[" << i << "].GetNcols!=DYTools::npTBinsMax" << std::endl;
       throw 2;
     }
   }
@@ -1081,9 +1081,9 @@ void PlotMatrixMYSlices(const std::vector<int> &indices, int functionOfRapidity,
   if (!functionOfRapidity) {
     for (unsigned int ii=0; ii<indices.size(); ++ii) {
       int iY=indices[ii];
-      double yMin=0, yMax=0;
-      DYTools::findAbsYValueRange(0, iY, yMin, yMax);
-      double yCenter=0.5*(yMin+yMax);
+      double pTMin=0, pTMax=0;
+      DYTools::findAbspTValueRange(0, iY, pTMin, pTMax);
+      double yCenter=0.5*(pTMin+pTMax);
 
       CPlot* cp=new CPlot();
       cplots.push_back(cp);
@@ -1102,7 +1102,7 @@ void PlotMatrixMYSlices(const std::vector<int> &indices, int functionOfRapidity,
 	//Hist->GetXaxis()->SetTitle("mass, GeV");
 	Hist->SetMarkerColor(colors[iSet%colorCount]);
 	for (int i=0; i<nM; i++) {
-	  int iRap=DYTools::findAbsYBin(i, yCenter);
+	  int iRap=DYTools::findAbspTBin(i, yCenter);
 	  if (printData) printf(" %6.1f-%6.1f  %8.2lf  %8.2lf\n",DYTools::massBinLimits[i],DYTools::massBinLimits[i+1],matrV[iSet](i,iRap),matrErrV[iSet](i,iRap));
 	  Hist->SetBinContent(i+1,matrV[iSet](i,iRap));
 	  Hist->SetBinError(i+1,matrErrV[iSet](i,iRap));
@@ -1129,15 +1129,15 @@ void PlotMatrixMYSlices(const std::vector<int> &indices, int functionOfRapidity,
 	TString drOpt=(iSet==0) ? drawOption : "LP";
 	snprintf(histBuf, hBufLen,"h%d_%s_mass%1.0f_%1.0f",iSet,histName.Data(),
 		 DYTools::massBinLimits[iMass], DYTools::massBinLimits[iMass+1]);
-	TH1F* Hist= new TH1F(histName,"", DYTools::nYBins[iMass], DYTools::yRangeMin, DYTools::yRangeMax);
+	TH1F* Hist= new TH1F(histName,"", DYTools::npTBins[iMass], DYTools::pTRangeMin, DYTools::pTRangeMax);
 	Hist->SetDirectory(0);
 	//Hist->GetXaxis()->SetTitle("|Y|");
 	Hist->SetMarkerColor(colors[iSet%colorCount]);
-	for (int j=0; j<DYTools::nYBins[iMass]; j++) {
+	for (int j=0; j<DYTools::npTBins[iMass]; j++) {
 	  if (printData) {
-	    double yMin,yMax;
-	    DYTools::findAbsYValueRange(0, j, yMin,yMax);
-	    printf(" %6.1f-%6.1f  %8.2lf  %8.2lf\n",yMin,yMax,matrV[iSet](iMass,j),matrErrV[iSet](iMass,j));
+	    double pTMin,pTMax;
+	    DYTools::findAbspTValueRange(0, j, pTMin,pTMax);
+	    printf(" %6.1f-%6.1f  %8.2lf  %8.2lf\n",pTMin,pTMax,matrV[iSet](iMass,j),matrErrV[iSet](iMass,j));
 	  }
 	  Hist->SetBinContent(j+1,matrV[iSet](iMass,j));
 	  Hist->SetBinError(j+1,matrErrV[iSet](iMass,j));
@@ -1176,12 +1176,12 @@ void PlotMatrixMYSlices(const std::vector<int> &indices, int functionOfRapidity,
   matrV.reserve(matrFIV.size()); matrErrV.reserve(matrErrFIV.size());
   int res=1;
   for (unsigned int i=0; res && (i<matrFIV.size()); ++i) {
-    TMatrixD temp(DYTools::nMassBins,DYTools::nYBinsMax);
+    TMatrixD temp(DYTools::nMassBins,DYTools::npTBinsMax);
     res=unfolding::deflattenMatrix(matrFIV[i], temp);
     if (res) matrV.push_back(temp);
   }
   for (unsigned int i=0; res && (i<matrErrFIV.size()); ++i) {
-    TMatrixD temp(DYTools::nMassBins,DYTools::nYBinsMax);
+    TMatrixD temp(DYTools::nMassBins,DYTools::npTBinsMax);
     res=unfolding::deflattenMatrix(matrErrFIV[i], temp);
     if (res) matrErrV.push_back(temp);
   }
@@ -1224,8 +1224,8 @@ void PrintMatrixMYSlices(const std::vector<int> &indices, int functionOfRapidity
     throw 2;
   }
   int nY=matrV[0].GetNcols();
-  if (nY!=DYTools::nYBinsMax) {
-    std::cout << "PrintMatrixMYSlices: nN!=DYTools::nYBinsMax" << std::endl;
+  if (nY!=DYTools::npTBinsMax) {
+    std::cout << "PrintMatrixMYSlices: nN!=DYTools::npTBinsMax" << std::endl;
     throw 2;
   }
   for (unsigned int i=0; i<matrV.size(); ++i) {
@@ -1234,7 +1234,7 @@ void PrintMatrixMYSlices(const std::vector<int> &indices, int functionOfRapidity
       throw 2;
     }
     if (nY!=matrV[i].GetNcols()) {
-      std::cout << "PrintMatrixMYSlices: matrV[" << i << "].GetNcols!=DYTools::nYBinsMax" << std::endl;
+      std::cout << "PrintMatrixMYSlices: matrV[" << i << "].GetNcols!=DYTools::npTBinsMax" << std::endl;
       throw 2;
     }
   }
@@ -1244,7 +1244,7 @@ void PrintMatrixMYSlices(const std::vector<int> &indices, int functionOfRapidity
       throw 2;
     }
     if (nY!=matrErrV[i].GetNcols()) {
-      std::cout << "PrintMatrixMYSlices: matrErrV[" << i << "].GetNcols!=DYTools::nYBinsMax" << std::endl;
+      std::cout << "PrintMatrixMYSlices: matrErrV[" << i << "].GetNcols!=DYTools::npTBinsMax" << std::endl;
       throw 2;
     }
   }
@@ -1252,9 +1252,9 @@ void PrintMatrixMYSlices(const std::vector<int> &indices, int functionOfRapidity
   if (!functionOfRapidity) {
     for (unsigned int ii=0; ii<indices.size(); ++ii) {
       int iY=indices[ii];
-      double yMin=0, yMax=0;
-      DYTools::findAbsYValueRange(0, iY, yMin, yMax);
-      double yCenter=0.5*(yMin+yMax);
+      double pTMin=0, pTMax=0;
+      DYTools::findAbspTValueRange(0, iY, pTMin, pTMax);
+      double yCenter=0.5*(pTMin+pTMax);
 
       printf("\n\n|Y|_{center}= %5.3f\n",yCenter);
       printf("   mass range   |");
@@ -1264,7 +1264,7 @@ void PrintMatrixMYSlices(const std::vector<int> &indices, int functionOfRapidity
       printf("\n");
 
       for (int i=0; i<nM; i++) {
-	int iRap=DYTools::findAbsYBin(i, yCenter);
+	int iRap=DYTools::findAbspTBin(i, yCenter);
 	printf(" %6.1f-%6.1f  ",DYTools::massBinLimits[i],DYTools::massBinLimits[i+1]);
 	for (unsigned int iSet=0; iSet<matrV.size(); ++iSet) {
 	  printf("   %8.2lf +/- %8.2lf",matrV[iSet](i,iRap),matrErrV[iSet](i,iRap));
@@ -1284,10 +1284,10 @@ void PrintMatrixMYSlices(const std::vector<int> &indices, int functionOfRapidity
       }
       printf("\n");
 
-      for (int j=0; j<DYTools::nYBins[iMass]; j++) {
-	double yMin,yMax;
-	DYTools::findAbsYValueRange(0, j, yMin,yMax);
-	printf(" %6.1f-%6.1f  ",yMin,yMax);
+      for (int j=0; j<DYTools::npTBins[iMass]; j++) {
+	double pTMin,pTMax;
+	DYTools::findAbspTValueRange(0, j, pTMin,pTMax);
+	printf(" %6.1f-%6.1f  ",pTMin,pTMax);
 	for (unsigned int iSet=0; iSet<matrV.size(); ++iSet) {
 	  printf("   %8.2lf +/- %8.2lf",matrV[iSet](iMass,j),matrErrV[iSet](iMass,j));
 	}
@@ -1312,12 +1312,12 @@ void PrintMatrixMYSlices(const std::vector<int> &indices, int functionOfRapidity
   matrV.reserve(matrFIV.size()); matrErrV.reserve(matrErrFIV.size());
   int res=1;
   for (unsigned int i=0; res && (i<matrFIV.size()); ++i) {
-    TMatrixD temp(DYTools::nMassBins,DYTools::nYBinsMax);
+    TMatrixD temp(DYTools::nMassBins,DYTools::npTBinsMax);
     res=unfolding::deflattenMatrix(matrFIV[i], temp);
     if (res) matrV.push_back(temp);
   }
   for (unsigned int i=0; res && (i<matrErrFIV.size()); ++i) {
-    TMatrixD temp(DYTools::nMassBins,DYTools::nYBinsMax);
+    TMatrixD temp(DYTools::nMassBins,DYTools::npTBinsMax);
     res=unfolding::deflattenMatrix(matrErrFIV[i], temp);
     if (res) matrErrV.push_back(temp);
   }

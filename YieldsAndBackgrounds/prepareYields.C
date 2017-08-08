@@ -200,7 +200,7 @@ void prepareYields(const TString conf  = "data_plot.conf",
 
   vector<TMatrixD*> yields;
   vector<TMatrixD*> yieldsSumw2;
-  int maxYBins = DYTools::findMaxYBins();
+  int maxpTBins = DYTools::findMaxpTBins();
   vector<TString> sampleTags;
 
   vector<TH1F*>    hMassv;
@@ -212,11 +212,11 @@ void prepareYields(const TString conf  = "data_plot.conf",
 
   char hname[100];
   for(UInt_t isam=0; isam<samplev.size(); isam++) {
-    TMatrixD *yieldsMatrix = new TMatrixD(DYTools::nMassBins, maxYBins);
+    TMatrixD *yieldsMatrix = new TMatrixD(DYTools::nMassBins, maxpTBins);
     (*yieldsMatrix) = 0;
     yields.push_back(yieldsMatrix);
     //
-    TMatrixD *yieldsSumw2Matrix = new TMatrixD(DYTools::nMassBins, maxYBins);
+    TMatrixD *yieldsSumw2Matrix = new TMatrixD(DYTools::nMassBins, maxpTBins);
     (*yieldsSumw2Matrix) = 0;
     yieldsSumw2.push_back(yieldsSumw2Matrix);
     //
@@ -342,7 +342,8 @@ void prepareYields(const TString conf  = "data_plot.conf",
     TMatrixD *thisSampleYieldsSumw2 = yieldsSumw2.at(isam);
 
     std::cout << "here are " << eventTree->GetEntries() << " entries in " << snamev[isam] << " sample\n";
-    for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
+    //for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
+    for(UInt_t ientry=0; ientry<10; ientry++) {
       eventTree->GetEntry(ientry);
       Double_t weight = data->weight;
 
@@ -381,12 +382,13 @@ void prepareYields(const TString conf  = "data_plot.conf",
 	  TLorentzVector ele2; 
 	  ele2.SetPtEtaPhiM(data->pt_2,data->eta_2,data->phi_2,0.000511);
 	  ele2 *= corr2;
-	  data->pt_2  = ele2.Pt();
+	  data->pt_2  = ele2.Pt(); 		
 	  data->eta_2 = ele2.Eta();
 	  data->phi_2 = ele2.Phi();
 	  //
 	  data->mass = (ele1+ele2).M();
-	  data->y = (ele1+ele2).Rapidity();
+	  data->y = (ele1+ele2).Rapidity(); 	
+	  data->pt = (ele1+ele2).Pt();
 	}else{
 	  data->mass = data->mass + smearingCorrection;
 	}
@@ -394,13 +396,13 @@ void prepareYields(const TString conf  = "data_plot.conf",
 
       // Find the 2D bin for this event:
       int massBin = DYTools::findMassBin(data->mass);
-      int yBin    = DYTools::findAbsYBin(massBin, data->y);
+      int pTBin    = DYTools::findAbspTBin(massBin, data->pt);
 
-      if ((massBin==-1) || (yBin==-1)) // out of range
+      if ((massBin==-1) || (pTBin==-1)) // out of range
 	continue;
 
-      (*thisSampleYields)(massBin,yBin) += weight;
-      (*thisSampleYieldsSumw2)(massBin,yBin) += weight*weight;
+      (*thisSampleYields)(massBin,pTBin) += weight;
+      (*thisSampleYieldsSumw2)(massBin,pTBin) += weight*weight;
 
       hMassv[isam]->Fill(data->mass,weight);
       hMassBinsv[isam]->Fill(data->mass,weight);
@@ -632,17 +634,17 @@ void prepareYields(const TString conf  = "data_plot.conf",
     totalSignalMCError[im] = 0;
     totalBg           [im] = 0;
     totalBgError      [im] = 0;
-    for(int iy = 0; iy < DYTools::nYBins[im]; iy++){
+    for(int ipT = 0; ipT < DYTools::npTBins[im]; ipT++){
       for( UInt_t isam = 0; isam < yields.size(); isam++){
 	if( sampleTags.at(isam) == TString("data") ){
-	  totalData[im] += (*yields.at(isam))(im,iy);
+	  totalData[im] += (*yields.at(isam))(im,ipT);
 	}else if ( sampleTags.at(isam) == TString("zee") ){
-	  totalSignalMC[im] += (*yields.at(isam))(im,iy);
-	  totalSignalMCError[im] += (*yieldsSumw2.at(isam))(im,iy);
+	  totalSignalMC[im] += (*yields.at(isam))(im,ipT);
+	  totalSignalMCError[im] += (*yieldsSumw2.at(isam))(im,ipT);
 	}else{
 	  // what remains are background samples
-	  totalBg[im] += (*yields.at(isam))(im,iy);
-	  totalBgError[im] += (*yieldsSumw2.at(isam))(im,iy);
+	  totalBg[im] += (*yields.at(isam))(im,ipT);
+	  totalBgError[im] += (*yieldsSumw2.at(isam))(im,ipT);
 	}
       } // end loop over samples
     } // end loop over rapidity bins

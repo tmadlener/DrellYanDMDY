@@ -266,14 +266,14 @@ TH1F *extractRapidityDependence(const TString &name, const TString &title,
 				int iMassBin, int perMassBinWidth=0) {
   TString hName= name + Form("_massBin%d",iMassBin);
   TString hTitle= title + Form("_massBin%d",iMassBin);
-  TH1F *h=new TH1F(name,title,DYTools::nYBins[iMassBin],DYTools::yRangeMin,DYTools::yRangeMax);
+  TH1F *h=new TH1F(name,title,DYTools::npTBins[iMassBin],DYTools::pTRangeMin,DYTools::pTRangeMax);
   h->SetDirectory(0);
   h->Sumw2();
-  for (int iY=0; iY<DYTools::nYBins[iMassBin]; ++iY) {
+  for (int ipT=0; ipT<DYTools::npTBins[iMassBin]; ++ipT) {
     double factor= (perMassBinWidth==0) ? 
       1 : 1/(DYTools::massBinLimits[iMassBin+1] - DYTools::massBinLimits[iMassBin]);
-    h->SetBinContent(iY+1, m[iMassBin][iY]*factor);
-    h->SetBinError(iY+1, fabs(mErr[iMassBin][iY])*factor);
+    h->SetBinContent(ipT+1, m[iMassBin][ipT]*factor);
+    h->SetBinError(ipT+1, fabs(mErr[iMassBin][ipT])*factor);
   }
   return h;
 }
@@ -283,44 +283,44 @@ TH1F *extractRapidityDependence(const TString &name, const TString &title,
 inline
 TH1F *extractMassDependence(const TString &name, const TString &title,
 			    const TMatrixD &m, const TMatrixD &mErr,
-			    int iYBin, 
+			    int ipTBin, 
 			    int perMassBinWidth=1, int perRapidityBinWidth=0) {
   if (perRapidityBinWidth) std::cout << "\n\tWARNING: extractMassDependence: perRapidityBinWidth=1 is experimental\n\n";
   std::cout << "dims  m[" << m.GetNrows() << ',' << m.GetNcols() << "], "
 	    << " mErr[" << mErr.GetNrows() << ',' << mErr.GetNcols() << "]"
 	    << std::endl;
   if ((m.GetNrows()!=DYTools::nMassBins) ||
-      (m.GetNcols()!=DYTools::nYBinsMax) ||
+      (m.GetNcols()!=DYTools::npTBinsMax) ||
       (mErr.GetNrows()!=DYTools::nMassBins) ||
-      (mErr.GetNcols()!=DYTools::nYBinsMax)) {
+      (mErr.GetNcols()!=DYTools::npTBinsMax)) {
     std::cout << "extractMassDependence: expecting matrices "
-	      << DYTools::nMassBins << "x" << DYTools::nYBinsMax 
+	      << DYTools::nMassBins << "x" << DYTools::npTBinsMax 
 	      << "  instead of  " 
 	      << m.GetNrows() << "x" << m.GetNcols() << "\n";
     assert(0);
   }
-  TString hName= name + Form("_yBin%d",iYBin);
-  TString hTitle= title + Form("_yBin%d",iYBin);
+  TString hName= name + Form("_yBin%d",ipTBin);
+  TString hTitle= title + Form("_yBin%d",ipTBin);
   TH1F *h=new TH1F(name,title,DYTools::nMassBins,DYTools::massBinLimits);
   h->SetDirectory(0);
   h->Sumw2();
   for (int iM=0; iM<DYTools::nMassBins; ++iM) {
     bool lastBin= (iM==DYTools::nMassBins-1) ? true : false;  
-    if (lastBin && (iYBin!=0)) {
-      double yc=DYTools::findAbsYValue(0,iYBin);
-      iYBin=DYTools::findAbsYBin(iM,yc);
+    if (lastBin && (ipTBin!=0)) {
+      double pTc=DYTools::findAbspTValue(0,ipTBin);
+      ipTBin=DYTools::findAbspTBin(iM,pTc);
     }
-    double val=m[iM][iYBin];
+    double val=m[iM][ipTBin];
     double factor=1.;
     if (iM==DYTools::nMassBins-1) {
-     factor *= DYTools::nYBins[iM]/double(DYTools::nYBins[0]);
+     factor *= DYTools::npTBins[iM]/double(DYTools::npTBins[0]);
     }
     if (perRapidityBinWidth) {
-      factor *= (DYTools::yRangeMax-DYTools::yRangeMin)/double(DYTools::nYBins[iM]);
+      factor *= (DYTools::pTRangeMax-DYTools::pTRangeMin)/double(DYTools::npTBins[iM]);
     }
     if (perMassBinWidth) factor/=(DYTools::massBinLimits[iM+1]-DYTools::massBinLimits[iM]);
     h->SetBinContent(iM+1, val*factor);
-    h->SetBinError(iM+1, fabs(mErr[iM][iYBin])*factor);
+    h->SetBinError(iM+1, fabs(mErr[iM][ipTBin])*factor);
   }
   return h;
 }
@@ -330,7 +330,7 @@ TH1F *extractMassDependence(const TString &name, const TString &title,
 inline
 TH1F *extractMassDependenceSpec(const TString &name, const TString &title,
 			    const TMatrixD &m, const TMatrixD &mErr,
-			    int iYBin,
+			    int ipTBin,
 			const TVectorD &massGrid, const TVectorD &yBinCount,
 			    int perMassBinWidth=1, int perRapidityBinWidth=0) {
   if (perRapidityBinWidth) std::cout << "\n\tWARNING: extractMassDependenceSpec: perRapidityBinWidth=1 is experimental\n\n";
@@ -341,8 +341,8 @@ TH1F *extractMassDependenceSpec(const TString &name, const TString &title,
 	    << std::endl;
   TVectorD yBinCountCheck(massGrid.GetNoElements()-1);
   yBinCountCheck=1;
-  if (iYBin!=0) {
-    std::cout << "extractMassDependenceSpec: iYBin should be 0\n";
+  if (ipTBin!=0) {
+    std::cout << "extractMassDependenceSpec: ipTBin should be 0\n";
     assert(0);
   }
   if ((m.GetNrows()!=massGrid.GetNoElements()-1) ||
@@ -355,8 +355,8 @@ TH1F *extractMassDependenceSpec(const TString &name, const TString &title,
 	      << m.GetNrows() << "x" << m.GetNcols() << "\n";
     assert(0);
   }
-  TString hName= name + Form("_yBin%d",iYBin);
-  TString hTitle= title + Form("_yBin%d",iYBin);
+  TString hName= name + Form("_yBin%d",ipTBin);
+  TString hTitle= title + Form("_yBin%d",ipTBin);
   double *massBins=new double[massGrid.GetNoElements()];
   for (int i=0; i<massGrid.GetNoElements(); ++i) {
     massBins[i]=massGrid[i];
@@ -368,14 +368,14 @@ TH1F *extractMassDependenceSpec(const TString &name, const TString &title,
   h->SetDirectory(0);
   h->Sumw2();
   for (int iM=0; iM<m.GetNrows(); ++iM) {
-    double val=m[iM][iYBin];
+    double val=m[iM][ipTBin];
     double factor=1.;
     if (perRapidityBinWidth) {
-      factor *= (DYTools::yRangeMax-DYTools::yRangeMin)/double(yBinCount[iM]);
+      factor *= (DYTools::pTRangeMax-DYTools::pTRangeMin)/double(yBinCount[iM]);
     }
     if (perMassBinWidth) factor/=(massGrid[iM+1]-massGrid[iM]);
     h->SetBinContent(iM+1, val*factor);
-    h->SetBinError(iM+1, fabs(mErr[iM][iYBin])*factor);
+    h->SetBinError(iM+1, fabs(mErr[iM][ipTBin])*factor);
   }
 
   return h;
@@ -439,12 +439,12 @@ void printSanityCheck(const TMatrixD &val, const TMatrixD &err, const TString &n
 {
   using namespace DYTools;
   std::cout<<"Sanity check printout"<<std::endl;
-  if (val.GetNrows()!=nMassBins || val.GetNcols()!=nYBinsMax)
+  if (val.GetNrows()!=nMassBins || val.GetNcols()!=npTBinsMax)
     {
       std::cout<<name<<" matrix has wrong size"<<std::endl;
       return;
     }
-  if (err.GetNrows()!=nMassBins || err.GetNcols()!=nYBinsMax)
+  if (err.GetNrows()!=nMassBins || err.GetNcols()!=npTBinsMax)
     {
       std::cout<<name<<"Err matrix has wrong size"<<std::endl;
       return;
@@ -452,7 +452,7 @@ void printSanityCheck(const TMatrixD &val, const TMatrixD &err, const TString &n
   int err_found=0;
   std::cout<<"Nan values of "<<name<<" or/and "<<name<<"Err:"<<std::endl;
   for(int i=0; i<DYTools::nMassBins; i++)
-    for (int yi=0; yi<nYBins[i]; ++yi) 
+    for (int yi=0; yi<npTBins[i]; ++yi) 
       {
         if ( (val(i,yi)!=val(i,yi)) || (err(i,yi)!=err(i,yi)) ) {
 	  err_found=1;
@@ -463,7 +463,7 @@ void printSanityCheck(const TMatrixD &val, const TMatrixD &err, const TString &n
   std::cout<<"Large errors ("<<name<<"Errv>0.1*"<<name<<" or "<<name<<"Err>0.1) :"<<std::endl;
   err_found=0;
   for(int i=0; i<DYTools::nMassBins; i++)
-    for (int yi=0; yi<nYBins[i]; ++yi) 
+    for (int yi=0; yi<npTBins[i]; ++yi) 
       {
         if ( fabs(err(i,yi))>0.1*fabs(val(i,yi)) || fabs(err(i,yi))>0.1) {
 	  std::cout<<"  "<<name<<"("<<i<<","<<yi<<")="<<val(i,yi)<<", "<<name<<"Err("<<i<<","<<yi<<")="<<err(i,yi)<<std::endl;

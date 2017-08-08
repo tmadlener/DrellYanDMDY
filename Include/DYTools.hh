@@ -89,7 +89,7 @@ namespace DYTools {
   // On 8 TeV, it is up to Y=2.4 to be consistent with muons
   const double pTRangeMax2D = 70.;
   // For 1D, extend max of Y to ~9, for 2D keep ~2.4-2.5:
-  const double pTRangeMax =  pTRangeMax2D + ((!study2D && extendpTRangeFor1D) ? 6.5 : 0); 
+  const double pTRangeMax =  pTRangeMax2D; 
   // For 7 TeV, for m<200 GeV, the range in Y is 0-2.5, and we have 25 bins,
   //   while for 8 TeV, the range in Y is 0-24, and we have 24 bins.
   // For 7 TeV last mass range has dY = 0.25 wide bins, for 8 TeV it is dY = 0.2
@@ -306,7 +306,7 @@ namespace DYTools {
       // but it is here done separately to avoid rounding uncertainty.
       pTBinLimits[npTBinsThisMassRange] = pTRangeMax;
       
-      for(int i=0; i < nYBinsThisMassRange; i++){
+      for(int i=0; i < npTBinsThisMassRange; i++){
 	if( pT >= pTBinLimits[i] && pT < pTBinLimits[i+1]) {
 	  result = i;
 	  break;
