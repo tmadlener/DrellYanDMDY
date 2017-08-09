@@ -342,8 +342,7 @@ void prepareYields(const TString conf  = "data_plot.conf",
     TMatrixD *thisSampleYieldsSumw2 = yieldsSumw2.at(isam);
 
     std::cout << "here are " << eventTree->GetEntries() << " entries in " << snamev[isam] << " sample\n";
-    //for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
-    for(UInt_t ientry=0; ientry<10; ientry++) {
+    for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
       eventTree->GetEntry(ientry);
       Double_t weight = data->weight;
 
@@ -398,8 +397,10 @@ void prepareYields(const TString conf  = "data_plot.conf",
       int massBin = DYTools::findMassBin(data->mass);
       int pTBin    = DYTools::findAbspTBin(massBin, data->pt);
 
-      if ((massBin==-1) || (pTBin==-1)) // out of range
+      if ((massBin==-1) || (pTBin==-1)){ // out of range
+	cout << pTBin << " " << massBin << " " <<  data->pt << " " << data->mass << "\n";	
 	continue;
+      }
 
       (*thisSampleYields)(massBin,pTBin) += weight;
       (*thisSampleYieldsSumw2)(massBin,pTBin) += weight*weight;
