@@ -398,7 +398,7 @@ void prepareYields(const TString conf  = "data_plot.conf",
       int pTBin    = DYTools::findAbspTBin(massBin, data->pt);
 
       if ((massBin==-1) || (pTBin==-1)){ // out of range
-	cout << pTBin << " " << massBin << " " <<  data->pt << " " << data->mass << "\n";	
+	// cout << pTBin << " " << massBin << " " <<  data->pt << " " << data->mass << "\n";	
 	continue;
       }
 

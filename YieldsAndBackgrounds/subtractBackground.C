@@ -135,7 +135,7 @@ TString subtractBackground(const TString conf,
   TMatrixD* yields[NSamples];
   TMatrixD* yieldsSumw2[NSamples];
   //since we have variable binning in rapidity, we have to determine the maximum number of Y-bins to create matrices
-  int nYBinsMax=DYTools::findMaxYBins();
+  int npTBinsMax=DYTools::findMaxpTBins();
   //fill out yields matrices from yields.root file
 
   // TString sn[NSamples];
@@ -182,23 +182,23 @@ TString subtractBackground(const TString conf,
     printf("    use MC estimates for fake dielectron backgrounds\n");
 
 
-  TMatrixD observedYields(DYTools::nMassBins,nYBinsMax);
-  TMatrixD observedYieldsErr(DYTools::nMassBins,nYBinsMax);
-  TMatrixD observedYieldsErrorSquared(DYTools::nMassBins,nYBinsMax);
-  TMatrixD signalYields(DYTools::nMassBins,nYBinsMax);
-  TMatrixD signalYieldsError(DYTools::nMassBins,nYBinsMax);
-  TMatrixD signalYieldsErrorSyst(DYTools::nMassBins,nYBinsMax);
+  TMatrixD observedYields(DYTools::nMassBins,npTBinsMax);
+  TMatrixD observedYieldsErr(DYTools::nMassBins,npTBinsMax);
+  TMatrixD observedYieldsErrorSquared(DYTools::nMassBins,npTBinsMax);
+  TMatrixD signalYields(DYTools::nMassBins,npTBinsMax);
+  TMatrixD signalYieldsError(DYTools::nMassBins,npTBinsMax);
+  TMatrixD signalYieldsErrorSyst(DYTools::nMassBins,npTBinsMax);
 
   // Matrices to store backgrounds
-  TMatrixD true2eBackground(DYTools::nMassBins,nYBinsMax);
-  TMatrixD true2eBackgroundError(DYTools::nMassBins,nYBinsMax);
-  TMatrixD true2eBackgroundErrorSyst(DYTools::nMassBins,nYBinsMax);
-  TMatrixD wzzz(DYTools::nMassBins,nYBinsMax);
-  TMatrixD wzzzError(DYTools::nMassBins,nYBinsMax);
-  TMatrixD wzzzErrorSyst(DYTools::nMassBins,nYBinsMax); 
-  TMatrixD fakeEleBackground(DYTools::nMassBins,nYBinsMax);
-  TMatrixD fakeEleBackgroundError(DYTools::nMassBins,nYBinsMax);
-  TMatrixD fakeEleBackgroundErrorSyst(DYTools::nMassBins,nYBinsMax);
+  TMatrixD true2eBackground(DYTools::nMassBins,npTBinsMax);
+  TMatrixD true2eBackgroundError(DYTools::nMassBins,npTBinsMax);
+  TMatrixD true2eBackgroundErrorSyst(DYTools::nMassBins,npTBinsMax);
+  TMatrixD wzzz(DYTools::nMassBins,npTBinsMax);
+  TMatrixD wzzzError(DYTools::nMassBins,npTBinsMax);
+  TMatrixD wzzzErrorSyst(DYTools::nMassBins,npTBinsMax); 
+  TMatrixD fakeEleBackground(DYTools::nMassBins,npTBinsMax);
+  TMatrixD fakeEleBackgroundError(DYTools::nMassBins,npTBinsMax);
+  TMatrixD fakeEleBackgroundErrorSyst(DYTools::nMassBins,npTBinsMax);
 
 
   true2eBackground = 0;
@@ -211,17 +211,17 @@ TString subtractBackground(const TString conf,
   fakeEleBackgroundError = 0;
   fakeEleBackgroundErrorSyst = 0;
   // The total background  
-  TMatrixD totalBackground(DYTools::nMassBins,nYBinsMax);
-  TMatrixD totalBackgroundError(DYTools::nMassBins,nYBinsMax);
-  TMatrixD totalBackgroundErrorSyst(DYTools::nMassBins,nYBinsMax);
+  TMatrixD totalBackground(DYTools::nMassBins,npTBinsMax);
+  TMatrixD totalBackgroundError(DYTools::nMassBins,npTBinsMax);
+  TMatrixD totalBackgroundErrorSyst(DYTools::nMassBins,npTBinsMax);
 
 
-  TMatrixD true2eBackgroundFromData(DYTools::nMassBins,nYBinsMax);       
-  TMatrixD true2eBackgroundFromDataError(DYTools::nMassBins,nYBinsMax);    
-  TMatrixD true2eBackgroundFromDataErrorSyst(DYTools::nMassBins,nYBinsMax);
-  TMatrixD fakeEleBackgroundFromData(DYTools::nMassBins,nYBinsMax);
-  TMatrixD fakeEleBackgroundFromDataError(DYTools::nMassBins,nYBinsMax);
-  TMatrixD fakeEleBackgroundFromDataErrorSyst(DYTools::nMassBins,nYBinsMax);
+  TMatrixD true2eBackgroundFromData(DYTools::nMassBins,npTBinsMax);       
+  TMatrixD true2eBackgroundFromDataError(DYTools::nMassBins,npTBinsMax);    
+  TMatrixD true2eBackgroundFromDataErrorSyst(DYTools::nMassBins,npTBinsMax);
+  TMatrixD fakeEleBackgroundFromData(DYTools::nMassBins,npTBinsMax);
+  TMatrixD fakeEleBackgroundFromDataError(DYTools::nMassBins,npTBinsMax);
+  TMatrixD fakeEleBackgroundFromDataErrorSyst(DYTools::nMassBins,npTBinsMax);
 
   // Calculate true dielectron background, which includes
   // WW, ttbar, Wt, and DY->tautau. By choice, we do not include WZ and ZZ.
@@ -260,7 +260,7 @@ TString subtractBackground(const TString conf,
 	  else if (sn[k]=="ttbar") mSyst=0.5;
 	  else if ((sn[k]=="ww") || (sn[k]=="wtop")) mSyst=1.0;
 	  for (int i=0; i<DYTools::nMassBins; i++)
-	    for (int j=0; j<DYTools::nYBins[i]; j++) {
+	    for (int j=0; j<DYTools::npTBins[i]; j++) {
 	      true2eBackground(i,j)+=aux1(i,j);
 	      true2eBackgroundError(i,j)+=aux2(i,j);
 	      true2eBackgroundErrorSyst(i,j)+= mSyst*mSyst*aux1(i,j)*aux1(i,j);
@@ -281,7 +281,7 @@ TString subtractBackground(const TString conf,
 	TMatrixD aux1= (* yields[k] );
 	TMatrixD aux2= (* yieldsSumw2[k] );
 	for (int i=0; i<DYTools::nMassBins; i++)
-	  for (int j=0; j<DYTools::nYBins[i]; j++) {
+	  for (int j=0; j<DYTools::npTBins[i]; j++) {
 	    wzzz(i,j)+=aux1(i,j);
 	    wzzzError(i,j)+=aux2(i,j);
 	    wzzzErrorSyst(i,j)+=aux1(i,j);
@@ -325,7 +325,7 @@ TString subtractBackground(const TString conf,
 	    TMatrixD aux1= (* yields[k]);
 	    TMatrixD aux2= (* yieldsSumw2[k]);
 	    for (int i=0; i<DYTools::nMassBins; i++)
-	      for (int j=0; j<DYTools::nYBins[i]; j++) {
+	      for (int j=0; j<DYTools::npTBins[i]; j++) {
 		fakeEleBackground(i,j)+=aux1(i,j);
 		fakeEleBackgroundError(i,j)+=aux2(i,j);
 		fakeEleBackgroundErrorSyst(i,j)+=0.5*0.5*aux1(i,j)*aux1(i,j);
@@ -344,7 +344,7 @@ TString subtractBackground(const TString conf,
   if (!useTrue2eBgDataDriven) {
     // add wzzz contribution
     for (int i=0; i<DYTools::nMassBins; ++i) {
-      for (int j=0; j<DYTools::nYBins[i]; ++j) {
+      for (int j=0; j<DYTools::npTBins[i]; ++j) {
 	totalTrue2eBackground(i,j)= true2eBackground(i,j) + wzzz(i,j);
 	totalTrue2eBackgroundError(i,j)= sqrt( SQR(true2eBackgroundError(i,j)) +
 					       SQR(wzzzError(i,j)) );
@@ -357,7 +357,7 @@ TString subtractBackground(const TString conf,
 
     // Calculate the total background
     for (int i=0; i<DYTools::nMassBins; i++)
-      for (int j=0; j<DYTools::nYBins[i]; j++) 
+      for (int j=0; j<DYTools::npTBins[i]; j++) 
         {
            totalBackground(i,j)=true2eBackground(i,j) + wzzz(i,j) + fakeEleBackground(i,j);
            totalBackgroundError(i,j)=sqrt( SQR(true2eBackgroundError(i,j)) +
@@ -379,7 +379,7 @@ TString subtractBackground(const TString conf,
       observedYieldsErrorSquared=*yieldsSumw2[k];
       observedYieldsErr=0;
       for (int i=0; i<DYTools::nMassBins; i++)
-	for (int j=0; j<DYTools::nYBins[i]; j++) {
+	for (int j=0; j<DYTools::npTBins[i]; j++) {
 	  double sy=observedYields(i,j) - totalBackground(i,j);
 	  signalYields(i,j) = (sy>0) ? sy : 0.;
 	  signalYieldsError(i,j) = 
@@ -391,9 +391,9 @@ TString subtractBackground(const TString conf,
     }
   }
 
-  TMatrixD bkgRatesUsual(DYTools::nMassBins,nYBinsMax);
+  TMatrixD bkgRatesUsual(DYTools::nMassBins,npTBinsMax);
   for (int i=0; i<DYTools::nMassBins; i++) { 
-    for (int j=0; j<DYTools::nYBins[i]; j++) { 
+    for (int j=0; j<DYTools::npTBins[i]; j++) { 
       double denom=observedYields(i,j);
       if (denom==0.0) bkgRatesUsual(i,j)=0;
       bkgRatesUsual(i,j)= 100.0*totalBackground(i,j)/denom;
@@ -405,8 +405,8 @@ TString subtractBackground(const TString conf,
   // data-MC residual difference: 
   // create weight factors to make MC prediction signal-like
   //
-  TMatrixD zeePredictedYield(DYTools::nMassBins,nYBinsMax);
-  TMatrixD zeePredictedYieldErr(DYTools::nMassBins,nYBinsMax);
+  TMatrixD zeePredictedYield(DYTools::nMassBins,npTBinsMax);
+  TMatrixD zeePredictedYieldErr(DYTools::nMassBins,npTBinsMax);
   int zeeFound=0;
   for (int i=0; i<NSamples; ++i) {
     if (sn[i] == "zee") {
@@ -427,10 +427,10 @@ TString subtractBackground(const TString conf,
   double countDataNoBkg=0., countMCsignal=0.;
   for (int i=0; i<DYTools::nMassBins; i++) {
     if ((DYTools::massBinLimits[i]>59.999) && (DYTools::massBinLimits[i+1]<120.0001)) {
-      for (int yi=0; yi<DYTools::nYBins[i]; ++yi) {
+      for (int yi=0; yi<DYTools::npTBins[i]; ++yi) {
 	countDataNoBkg += signalYields[i][yi];
       }
-      for (int yi=0; yi<DYTools::nYBins[i]; ++yi) {
+      for (int yi=0; yi<DYTools::npTBins[i]; ++yi) {
 	countMCsignal += zeePredictedYield[i][yi];
       }
     }
@@ -444,11 +444,11 @@ TString subtractBackground(const TString conf,
     assert(0);
   }
   // 2. create weight maps
-  TMatrixD zeeMCShapeReweight(DYTools::nMassBins,nYBinsMax);
+  TMatrixD zeeMCShapeReweight(DYTools::nMassBins,npTBinsMax);
   zeeMCShapeReweight=0;
   double ZpeakFactor = countMCsignal/double(countDataNoBkg);
   for (int i=0; i<DYTools::nMassBins; i++) {
-    for (int yi=0; yi<DYTools::nYBins[i]; ++yi) {
+    for (int yi=0; yi<DYTools::npTBins[i]; ++yi) {
       double mc = zeePredictedYield[i][yi];
       double weight=(fabs(mc)<1e-7) ?  
 	0. :  ( ZpeakFactor * signalYields[i][yi] / mc );
@@ -509,9 +509,9 @@ TString subtractBackground(const TString conf,
 	printf("   and syst error on signal yield contains syst error on background\n");
 	printf("mass range   rapidity range   observed       true2e-bg         wz-zz-bg               fake-bg                 total-bg            signal\n");
       }
-      for (int yi=0; yi<DYTools::nYBins[i]; ++yi) {
+      for (int yi=0; yi<DYTools::npTBins[i]; ++yi) {
 	double absYmin=0, absYmax=0;
-	DYTools::findAbsYValueRange(i,yi, absYmin,absYmax);
+	DYTools::findAbspTValueRange(i,yi, absYmin,absYmax);
 	printf("%5.1f-%5.1f GeV ", DYTools::massBinLimits[i], DYTools::massBinLimits[i+1]);
 	printf("%4.2f-%4.2f ", absYmin,absYmax);
 	printf(" %7.0f+-%3.0f ", observedYields[i][yi], observedYieldsErr[i][yi]);
@@ -539,9 +539,9 @@ TString subtractBackground(const TString conf,
 	printf("   and syst error on signal yield contains syst error on background\n");
 	printf("mass range   rapidity range   observed       true2e-bg         fake-bg                 total-bg            signal\n");
       }
-      for (int yi=0; yi<DYTools::nYBins[i]; ++yi) {
+      for (int yi=0; yi<DYTools::npTBins[i]; ++yi) {
 	double absYmin=0, absYmax=0;
-	DYTools::findAbsYValueRange(i,yi, absYmin,absYmax);
+	DYTools::findAbspTValueRange(i,yi, absYmin,absYmax);
 	printf("%5.1f-%5.1f GeV ", DYTools::massBinLimits[i], DYTools::massBinLimits[i+1]);
 	printf("%4.2f-%4.2f ", absYmin,absYmax);
 	printf(" %7.0f+-%3.0f ", observedYields[i][yi], observedYieldsErr[i][yi]);
@@ -646,18 +646,18 @@ TString subtractBackground(const TString conf,
     }
 
     if (1) {
-      const int iYBin=0;
+      const int ipTBin=0;
       const int perMassBinWidth=0;
-      const int perRapidityBinWidth=0;
+      const int perRapiditpTBinWidth=0;
       TCanvas *canvZpeak=MakeCanvas("canvZpeak","canvZpeak",800,900);
       TH1F* hDataNoBkg=extractMassDependence("hDataNoBkg","", 
 					     signalYields,signalYieldsError,
-					     iYBin,
-					     perMassBinWidth,perRapidityBinWidth);
+					     ipTBin,
+					     perMassBinWidth,perRapiditpTBinWidth);
       TH1F *hZee=extractMassDependence("hZee","",
 				       zeePredictedYield,zeePredictedYieldErr,
-				       iYBin,
-				       perMassBinWidth,perRapidityBinWidth);
+				       ipTBin,
+				       perMassBinWidth,perRapiditpTBinWidth);
       if (!hZee) {
 	std::cout << "\n\n\tError: failed to locate Zee sample\n\n";
       }
@@ -692,13 +692,13 @@ TString subtractBackground(const TString conf,
 Bool_t checkMatrixSize(TMatrixD m)
 {  
   if (m.GetNrows()==DYTools::nMassBins) {
-    if ((m.GetNcols()==DYTools::findMaxYBins()) ||
-	(m.GetNcols()==DYTools::nYBinsMax) ) {
+    if ((m.GetNcols()==DYTools::findMaxpTBins()) ||
+	(m.GetNcols()==DYTools::npTBinsMax) ) {
       return 1;
     }
   }
 
-  std::cout << "m.dims (" << m.GetNrows() << " x " << m.GetNcols() << ") instead of expected (" << DYTools::nMassBins << " x " << DYTools::findMaxYBins() << ") or (" << DYTools::nMassBins << " x " << DYTools::nYBinsMax << ")" << std::endl;
+  std::cout << "m.dims (" << m.GetNrows() << " x " << m.GetNcols() << ") instead of expected (" << DYTools::nMassBins << " x " << DYTools::findMaxpTBins() << ") or (" << DYTools::nMassBins << " x " << DYTools::npTBinsMax << ")" << std::endl;
   return 0;
 }
 
@@ -736,9 +736,9 @@ void bkgTablesToLatex(TMatrixD true2eBackground, TMatrixD true2eBackgroundError,
 	// Table 1: split background into true, wz/zz, and qcd
 	fprintf(txtFile,"mass range     true2e-bg         fake-bg             total-bg\n");
       }
-      for (int yi=0; yi<DYTools::nYBins[i]; ++yi) {
+      for (int yi=0; yi<DYTools::npTBins[i]; ++yi) {
 	double absYmin=0, absYmax=0;
-	DYTools::findAbsYValueRange(i,yi, absYmin,absYmax);
+	DYTools::findAbspTValueRange(i,yi, absYmin,absYmax);
 	fprintf(txtFile,"%5.0f-%5.0f & ", DYTools::massBinLimits[i], DYTools::massBinLimits[i+1]);
 	//printf("%4.2f-%4.2f ", absYmin,absYmax);
 	fprintf(txtFile," $%5.0f\\pm%4.0f\\pm%4.0f$& ", true2eBackground[i][yi], true2eBackgroundError[i][yi], true2eBackgroundErrorSyst[i][yi]);
@@ -767,9 +767,9 @@ void bkgTablesToLatex(TMatrixD true2eBackground, TMatrixD true2eBackgroundError,
 	fprintf(txtFile,"   and syst error on signal yield contains syst error on background\n");
 	fprintf(txtFile,"mass range         MM-true2e          DD-true2e          MC-fake            DD-fake\n");
       }
-      for (int yi=0; yi<DYTools::nYBins[i]; ++yi) {
+      for (int yi=0; yi<DYTools::npTBins[i]; ++yi) {
 	double absYmin=0, absYmax=0;
-	DYTools::findAbsYValueRange(i,yi, absYmin,absYmax);
+	DYTools::findAbspTValueRange(i,yi, absYmin,absYmax);
 	fprintf(txtFile,"%5.0f-%5.0f & ", DYTools::massBinLimits[i], DYTools::massBinLimits[i+1]);
 	fprintf(txtFile," $%5.0f\\pm%4.0f\\pm%4.0f$& ", true2eBackground[i][yi], true2eBackgroundError[i][yi], true2eBackgroundErrorSyst[i][yi]);
 	fprintf(txtFile," $%5.0f\\pm%4.0f\\pm%4.0f$", true2eBackgroundFromData[i][yi], true2eBackgroundFromDataError[i][yi], true2eBackgroundFromDataErrorSyst[i][yi]);
