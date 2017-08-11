@@ -510,7 +510,7 @@ void prepareYields(const TString conf  = "data_plot.conf",
   }
 
   //
-  // Draw mass spectrum without rapidity binning
+  // Draw mass spectrum without pT binning
   //
 
 
@@ -523,7 +523,7 @@ void prepareYields(const TString conf  = "data_plot.conf",
   // Draw the flattened figure (Y histograms for different mass regions)
   DrawFlattened(yields, yieldsSumw2, samplev, snamev, hasData, mergeDibosons, labelDibosons, colorDibosons, lumi, lumitext, fYieldPlots);
 
-  // Draw rapidity in mass slices 
+  // Draw pT in mass slices 
   if (DYTools::study2D==1)
     {
        Draw6Canvases(yields, yieldsSumw2, samplev, snamev, hasData, dataOverMc, dataOverMcEachBin, 1, 0, fYieldPlots);
@@ -542,10 +542,10 @@ void prepareYields(const TString conf  = "data_plot.conf",
 
   // Pack info into writable objects
   //TVectorD massBinLimits(nMassBins+1);
-  //TVectorD rapidityBinning(nMassBins+1);
+  //TVectorD pTBinning(nMassBins+1);
   //for(int i=0; i <= nMassBins; i++){
   //  massBinLimits(i) = DYTools::massBinLimits[i];
-  //  rapidityBinning(i) = DYTools::nYBins[i];
+  //  pTBinning(i) = DYTools::nYBins[i];
   //}
 
   // This dummy object is only needed to convey the number
@@ -560,7 +560,7 @@ void prepareYields(const TString conf  = "data_plot.conf",
   fNameOutYields += ".root";
   TFile fYields( fNameOutYields, "recreate" );
   //massBinLimits      .Write("massBinLimits");
-  //rapidityBinning    .Write("rapidityBinning");
+  //pTBinning    .Write("pTBinning");
   unfolding::writeBinningArrays(fYields);
   dummySampleCount   .Write("dummySampleCount");
   unfolding::writeBinningArrays(fYields);
@@ -620,9 +620,9 @@ void prepareYields(const TString conf  = "data_plot.conf",
   cout << endl;
 
   //
-  // Summary printout in mass bins, integrated over rapidity
+  // Summary printout in mass bins, integrated over pT
   //
-  // Add yields over rapidity bins
+  // Add yields over pT bins
   double totalData            [DYTools::nMassBins];
   double totalSignalMC        [DYTools::nMassBins];
   double totalSignalMCError   [DYTools::nMassBins];
@@ -648,12 +648,12 @@ void prepareYields(const TString conf  = "data_plot.conf",
 	  totalBgError[im] += (*yieldsSumw2.at(isam))(im,ipT);
 	}
       } // end loop over samples
-    } // end loop over rapidity bins
+    } // end loop over pT bins
     totalBgError[im] = sqrt( totalBgError[im] );
     totalSignalMCError[im] = sqrt( totalSignalMCError[im] );
   } // end loop over mass bins
 
-  printf("Printout of the data, MC signal and MC backgrounds integrated over rapidity\n");
+  printf("Printout of the data, MC signal and MC backgrounds integrated over pT\n");
   printf("     mass bin        data      MC-signal     MC-backgr\n");
   for(int im = 0; im < DYTools::nMassBins; im++){
     printf("%5.0f-%5.0f GeV: ", DYTools::massBinLimits[im],

@@ -98,8 +98,8 @@ public:
 public:
   TUnfoldingMatrixType_t kind;
   TString name, iniYieldsName, finYieldsName;
-  TMatrixD *yieldsIni; //(DYTools::nMassBins,DYTools::nYBinsMax);
-  TMatrixD *yieldsFin; //(DYTools::nMassBins,DYTools::nYBinsMax);
+  TMatrixD *yieldsIni; //(DYTools::nMassBins,DYTools::npTBinsMax);
+  TMatrixD *yieldsFin; //(DYTools::nMassBins,DYTools::npTBinsMax);
 
   // Matrices for unfolding
   TMatrixD *DetMigration; //(nUnfoldingBins, nUnfoldingBins);
@@ -140,7 +140,7 @@ public:
     DetResponseArr(0), DetInvertedResponseArr(0), DetInvertedResponseErrArr(0),
     yieldsIniArr(0), yieldsFinArr(0)
   {
-    TMatrixD my(DYTools::nMassBins,DYTools::nYBinsMax);
+    TMatrixD my(DYTools::nMassBins,DYTools::npTBinsMax);
     TMatrixD unf(nUnfoldingBins, nUnfoldingBins);
     TVectorD arr(nUnfoldingBins);
     my=0; unf=0; arr=0;
@@ -155,30 +155,30 @@ public:
     UnfoldingMatrix_t::getYieldNames(set_kind, iniYieldsName, finYieldsName);
   }
 
-  void fillIni(int iMassBinGen, int iYBinGen, double fullWeight) {
+  void fillIni(int iMassBinGen, int ipTBinGen, double fullWeight) {
     using namespace DYTools;
-    if ((iMassBinGen==-1) || (iYBinGen==-1)) {
+    if ((iMassBinGen==-1) || (ipTBinGen==-1)) {
       return;
     }
     if ((iMassBinGen >= nMassBins) ||
-	(iYBinGen >= nYBins[iMassBinGen])) {
-      std::cout << "UnfoldingMatrix_t::fillIni(" << iMassBinGen << "," << iYBinGen << "): incorrect indices. Max values (" << nMassBins << "," << (((iMassBinGen>=0) && (iMassBinGen<nMassBins)) ? nYBins[iMassBinGen] : nYBinsMax) << "; matrixName=<" << name << ">\n";
+	(ipTBinGen >= npTBins[iMassBinGen])) {
+      std::cout << "UnfoldingMatrix_t::fillIni(" << iMassBinGen << "," << ipTBinGen << "): incorrect indices. Max values (" << nMassBins << "," << (((iMassBinGen>=0) && (iMassBinGen<nMassBins)) ? npTBins[iMassBinGen] : npTBinsMax) << "; matrixName=<" << name << ">\n";
       assert(0);
     }
-    (*yieldsIni)(iMassBinGen,iYBinGen) += fullWeight;
+    (*yieldsIni)(iMassBinGen,ipTBinGen) += fullWeight;
   }
 
-  void fillFin(int iMassBinReco, int iYBinReco, double fullWeight) {
+  void fillFin(int iMassBinReco, int ipTBinReco, double fullWeight) {
     using namespace DYTools;
-    if ((iMassBinReco==-1) || (iYBinReco==-1)) {
+    if ((iMassBinReco==-1) || (ipTBinReco==-1)) {
       return;
     }
     if ((iMassBinReco >= nMassBins) ||
-	(iYBinReco >= nYBins[iMassBinReco])) {
-      std::cout << "UnfoldingMatrix_t::fillPostFin(" << iMassBinReco << "," << iYBinReco << "): incorrect indices. Max values (" << nMassBins << "," << (((iMassBinReco>=0) && (iMassBinReco<nMassBins)) ? nYBins[iMassBinReco] : nYBinsMax) << "; matrixName=<" << name << ">\n";
+	(ipTBinReco >= npTBins[iMassBinReco])) {
+      std::cout << "UnfoldingMatrix_t::fillPostFin(" << iMassBinReco << "," << ipTBinReco << "): incorrect indices. Max values (" << nMassBins << "," << (((iMassBinReco>=0) && (iMassBinReco<nMassBins)) ? npTBins[iMassBinReco] : npTBinsMax) << "; matrixName=<" << name << ">\n";
       assert(0);
     }
-    (*yieldsFin)(iMassBinReco,iYBinReco) += fullWeight;
+    (*yieldsFin)(iMassBinReco,ipTBinReco) += fullWeight;
   }
 
   void fillMigration(int idx1, int idx2, double weight) {
@@ -893,7 +893,7 @@ void makeUnfoldingMatrixFsr(const TString input,
   TH2F *hMassDiffV = new TH2F("hMassDiffV","",
 			      nUnfoldingBins, -0.5, nUnfoldingBins-0.5,
 			      100, -50.0, 50.0);
-  TH2F *hYDiffV = new TH2F("hYDiffV","",
+  TH2F *hpTDiffV = new TH2F("hpTDiffV","",
 			   nUnfoldingBins, -0.5, nUnfoldingBins-0.5,
 			   100, -5.0, 5.0);
 
@@ -994,11 +994,11 @@ void makeUnfoldingMatrixFsr(const TString input,
       }
 
       int iMassBinGenPreFsr = DYTools::findMassBin(gen->vmass);
-      int iYBinGenPreFsr = DYTools::findAbsYBin(iMassBinGenPreFsr, gen->vy);
+      int ipTBinGenPreFsr = DYTools::findAbspTBin(iMassBinGenPreFsr, gen->vpt); //C: changed vy -> vpt
       int iMassBinGenPostFsr = DYTools::findMassBin(gen->mass);
-      int iYBinGenPostFsr = DYTools::findAbsYBin(iMassBinGenPostFsr, gen->y);
-      int idxGenPreFsr = DYTools::findIndexFlat(iMassBinGenPreFsr, iYBinGenPreFsr);
-      int idxGenPostFsr = DYTools::findIndexFlat(iMassBinGenPostFsr, iYBinGenPostFsr);
+      int ipTBinGenPostFsr = DYTools::findAbspTBin(iMassBinGenPostFsr, gen->pt); //C: changed y -> pt
+      int idxGenPreFsr = DYTools::findIndexFlat(iMassBinGenPreFsr, ipTBinGenPreFsr);
+      int idxGenPostFsr = DYTools::findIndexFlat(iMassBinGenPostFsr, ipTBinGenPostFsr);
 
       // full fullGenWeight is not affected by reweighting
       double fullGenWeight_tmp = reweight * scale * gen->weight * fewz_weight;
@@ -1008,12 +1008,12 @@ void makeUnfoldingMatrixFsr(const TString input,
       { // a block for debug purposes
 	double fullGenWeight=fullGenWeightPU;
 
-      fsrGood.fillIni(iMassBinGenPreFsr,iYBinGenPreFsr, fullGenWeight);
-      fsrGood.fillFin(iMassBinGenPostFsr,iYBinGenPostFsr, fullGenWeight);
+      fsrGood.fillIni(iMassBinGenPreFsr,ipTBinGenPreFsr, fullGenWeight);
+      fsrGood.fillFin(iMassBinGenPostFsr,ipTBinGenPostFsr, fullGenWeight);
       if (validFlatIndices(idxGenPreFsr, idxGenPostFsr)) {
 	fsrGood.fillMigration(idxGenPreFsr,idxGenPostFsr, fullGenWeight);
-	fsrExact.fillIni(iMassBinGenPreFsr,iYBinGenPreFsr, fullGenWeight);
-	fsrExact.fillFin(iMassBinGenPostFsr,iYBinGenPostFsr, fullGenWeight);
+	fsrExact.fillIni(iMassBinGenPreFsr,ipTBinGenPreFsr, fullGenWeight);
+	fsrExact.fillFin(iMassBinGenPostFsr,ipTBinGenPostFsr, fullGenWeight);
 	fsrExact.fillMigration(idxGenPreFsr,idxGenPostFsr, fullGenWeight);
       }
  
@@ -1022,9 +1022,9 @@ void makeUnfoldingMatrixFsr(const TString input,
 				 gen->vpt_2, gen->veta_2) ) {
 	if (validFlatIndex(idxGenPreFsr)) {
 	  preFsrOk=1;
-	  fsrDET    .fillIni(iMassBinGenPreFsr,iYBinGenPreFsr,fullGenWeight);
-	  fsrDET_Mdf.fillIni(iMassBinGenPreFsr,iYBinGenPreFsr,fullGenWeight);
-	  fsrDET_good.fillIni(iMassBinGenPreFsr,iYBinGenPreFsr,fullGenWeight);
+	  fsrDET    .fillIni(iMassBinGenPreFsr,ipTBinGenPreFsr,fullGenWeight);
+	  fsrDET_Mdf.fillIni(iMassBinGenPreFsr,ipTBinGenPreFsr,fullGenWeight);
+	  fsrDET_good.fillIni(iMassBinGenPreFsr,ipTBinGenPreFsr,fullGenWeight);
 	}
       }
       
@@ -1032,9 +1032,9 @@ void makeUnfoldingMatrixFsr(const TString input,
 				 gen->pt_2, gen->eta_2 ) ) {
 	if (validFlatIndex(idxGenPostFsr)) {
 	  postFsrOk=1;
-	  fsrDET    .fillFin(iMassBinGenPostFsr,iYBinGenPostFsr,fullGenWeight);
-	  fsrDET_Mdf.fillFin(iMassBinGenPostFsr,iYBinGenPostFsr,fullGenWeight);
-	  fsrDET_good.fillFin(iMassBinGenPostFsr,iYBinGenPostFsr,fullGenWeight);
+	  fsrDET    .fillFin(iMassBinGenPostFsr,ipTBinGenPostFsr,fullGenWeight);
+	  fsrDET_Mdf.fillFin(iMassBinGenPostFsr,ipTBinGenPostFsr,fullGenWeight);
+	  fsrDET_good.fillFin(iMassBinGenPostFsr,ipTBinGenPostFsr,fullGenWeight);
 	}
       }
 
@@ -1042,8 +1042,8 @@ void makeUnfoldingMatrixFsr(const TString input,
 	fsrDET.fillMigration(idxGenPreFsr,idxGenPostFsr, fullGenWeight);
 	fsrDET_Mdf.fillMigration(idxGenPreFsr,idxGenPostFsr, fullGenWeight);
 	fsrDET_good.fillMigration(idxGenPreFsr,idxGenPostFsr, fullGenWeight);
-      	fsrDETexact.fillIni(iMassBinGenPreFsr,iYBinGenPreFsr,fullGenWeight);
-	fsrDETexact.fillFin(iMassBinGenPostFsr,iYBinGenPostFsr,fullGenWeight);
+      	fsrDETexact.fillIni(iMassBinGenPreFsr,ipTBinGenPreFsr,fullGenWeight);
+	fsrDETexact.fillFin(iMassBinGenPostFsr,ipTBinGenPostFsr,fullGenWeight);
 	fsrDETexact.fillMigration(idxGenPreFsr,idxGenPostFsr, fullGenWeight);
       }
       }
@@ -1143,17 +1143,17 @@ void makeUnfoldingMatrixFsr(const TString input,
 	// those entries are just dropped. This can be improved.
 	// The only possible cases are: underflow in mass and overflow in Y.
 
-	// Fill the matrix of post-FSR generator level invariant mass and rapidity
-	detResponse.fillIni( iMassBinGenPostFsr, iYBinGenPostFsr, fullGenWeightPU );
+	// Fill the matrix of post-FSR generator level invariant mass and pT
+	detResponse.fillIni( iMassBinGenPostFsr, ipTBinGenPostFsr, fullGenWeightPU );
 
-	// Fill the matrix of the reconstruction level mass and rapidity
+	// Fill the matrix of the reconstruction level mass and pT
 	int iMassReco = DYTools::findMassBin(massResmeared);
-	int iYReco = DYTools::findAbsYBin(iMassReco, dielectron->y);
-	detResponse.fillFin( iMassReco, iYReco, fullGenWeightPU );
+	int ipTReco = DYTools::findAbspTBin(iMassReco, dielectron->pt);
+	detResponse.fillFin( iMassReco, ipTReco, fullGenWeightPU );
 
 	double shape_weight = 1.0;
-	if( shapeWeights && iMassReco != -1 && iYReco != -1) {
-	    shape_weight = (*shapeWeights)[iMassReco][iYReco];
+	if( shapeWeights && iMassReco != -1 && ipTReco != -1) {
+	    shape_weight = (*shapeWeights)[iMassReco][ipTReco];
 	    std::cout << "massResmeared=" << massResmeared << ", iMassReco=" << iMassReco << ", shapeWeight=" << shape_weight << "\n";
 	}
 
@@ -1161,15 +1161,15 @@ void makeUnfoldingMatrixFsr(const TString input,
         // Unlike the mass vs Y reference yields matrices, to prepare the
 	// migration matrix we flatten (mass,Y) into a 1D array, and then
 	// store (mass,Y in 1D)_gen vs (mass,Y in 1D)_rec
-	int iIndexFlatGen  = DYTools::findIndexFlat(iMassBinGenPostFsr, iYBinGenPostFsr);
- 	int iIndexFlatReco = DYTools::findIndexFlat(iMassReco, iYReco);
+	int iIndexFlatGen  = DYTools::findIndexFlat(iMassBinGenPostFsr, ipTBinGenPostFsr);
+ 	int iIndexFlatReco = DYTools::findIndexFlat(iMassReco, ipTReco);
 	if ( validFlatIndices(iIndexFlatGen, iIndexFlatReco) ) {
 	  ec.numDielectronsGoodMass_inc();
 	  double fullWeightPU = fullGenWeightPU * shape_weight;
 	  //std::cout << "adding DetMig(" << iIndexFlatGen << "," << iIndexFlatReco << ") = " << reweight << "*" << scale << "*" << gen->weight << "*" << shape_weight << "*" << wPU << " = "  << (reweight * scale * gen->weight * shape_weight) << "\n";
 	  detResponse.fillMigration(iIndexFlatGen, iIndexFlatReco, fullWeightPU );
-	  detResponseExact.fillIni( iMassBinGenPostFsr, iYBinGenPostFsr, fullGenWeightPU );
-	  detResponseExact.fillFin( iMassReco, iYReco, fullGenWeightPU );
+	  detResponseExact.fillIni( iMassBinGenPostFsr, ipTBinGenPostFsr, fullGenWeightPU );
+	  detResponseExact.fillFin( iMassReco, ipTReco, fullGenWeightPU );
 	  detResponseExact.fillMigration(iIndexFlatGen, iIndexFlatReco, fullGenWeightPU );
 	}
 
@@ -1185,7 +1185,7 @@ void makeUnfoldingMatrixFsr(const TString input,
 	  hMassDiffEE->Fill(massResmeared - gen->mass);
 	
 	hMassDiffV->Fill(iIndexFlatGen, massResmeared - gen->mass);
-	hYDiffV   ->Fill(iIndexFlatGen, dielectron->y - gen->y);
+	hpTDiffV   ->Fill(iIndexFlatGen, dielectron->pt - gen->pt);
 // 	if(iIndexFlatGen != -1){
 // 	  hMassDiffV[iIndexFlatGen]->Fill(massResmeared - gen->mass);
 // 	}
@@ -1368,9 +1368,9 @@ void makeUnfoldingMatrixFsr(const TString input,
 
   //
   // Draw a plot that illustrates the detector resolution effects.
-  // We plot (gen-rec)/gen as a function of mass and rapidity.
+  // We plot (gen-rec)/gen as a function of mass and pT.
   //
-  TMatrixD resolutionEffect(DYTools::nMassBins,DYTools::nYBinsMax);
+  TMatrixD resolutionEffect(DYTools::nMassBins,DYTools::npTBinsMax);
   resolutionEffect = 0;
   for(int i=0; i < resolutionEffect.GetNrows(); i++){
     for(int j=0; j < resolutionEffect.GetNcols(); j++){
@@ -1386,7 +1386,7 @@ void makeUnfoldingMatrixFsr(const TString input,
   //
   // Draw a plot that illustrates the losses due to reconstruction
   // We plot (preFsrExact-preFsr)/preFsrExact as a 
-  // function of mass and rapidity.
+  // function of mass and pT.
   //
   TMatrixD *unfRecoEffect=detResponseExact.getReconstructionEffect(detResponse);
   unfRecoEffect->Print();
@@ -1426,7 +1426,7 @@ void makeUnfoldingMatrixFsr(const TString input,
   SaveCanvas(g,"massDiff");
 //   if (fPlots) g->Write();
 
-  // Create a plot of reco - gen post-FSR mass and rapidity difference 
+  // Create a plot of reco - gen post-FSR mass and pT difference 
   TCanvas *h1 = MakeCanvas("canvMassDiffV","canvMassDiffV",600,600);
   CPlot plotMassDiffV("massDiffV","",
 		      "flat index",
@@ -1435,14 +1435,14 @@ void makeUnfoldingMatrixFsr(const TString input,
   plotMassDiffV.Draw(h1);
   SaveCanvas(h1,"hMassDiffV");
 
-  // Create a plot of reco - gen post-FSR mass and rapidity difference 
-  TCanvas *h2 = MakeCanvas("canvYDiffV","canvYDiffV",600,600);
-  CPlot plotYDiffV("massDiffV","",
+  // Create a plot of reco - gen post-FSR mass and pT difference 
+  TCanvas *h2 = MakeCanvas("canvYDiffpT","canvYDiffpT",600,600);
+  CPlot plotYDiffpT("massDiffV","",
 		      "flat index",
-		      "reco Y - gen post-FSR Y");
-  plotYDiffV.AddHist2D(hYDiffV,"LEGO");
-  plotYDiffV.Draw(h2);
-  SaveCanvas(h2,"hYDiffV");
+		      "reco pT - gen post-FSR pT");
+  plotYDiffpT.AddHist2D(hpTDiffV,"LEGO");
+  plotYDiffpT.Draw(h2);
+  SaveCanvas(h2,"hpTDiffV");
 
   if (fPlots) {
     fPlots->Close();
@@ -1491,9 +1491,9 @@ void makeUnfoldingMatrixFsr(const TString input,
   //Print errors of the Unfolding matrix when they exceed 0.1
   /*
   for (int iM=0; iM<DYTools::nMassBins; iM++)
-    for (int iY=0; iY<DYTools::nYBins[iM]; iY++)
+    for (int iY=0; iY<DYTools::npTBins[iM]; iY++)
       for (int jM=0; jM<DYTools::nMassBins; jM++)
-        for (int jY=0; jY<DYTools::nYBins[jM]; jY++)
+        for (int jY=0; jY<DYTools::npTBins[jM]; jY++)
           {
 	    int i=DYTools::findIndexFlat(iM,iY);
 	    int j=DYTools::findIndexFlat(jM,jY);           
