@@ -142,25 +142,25 @@ void plotDYAcceptance(const TString input, int systematicsMode = DYTools::NORMAL
   // Set up histograms
   //
 
-  //int nYBinsMax=DYTools::findMaxYBins();
+  //int npTBinsMax=DYTools::findMaxpTBins();
 
 
   vector<TH1F*> hZMassv;//, hZMass2v, hZPtv, hZPt2v, hZyv, hZPhiv;  
   
   Double_t   nZv = 0;
 
-  TMatrixD nEventsv (DYTools::nMassBins,DYTools::nYBinsMax);  
-  TMatrixD nPassv   (DYTools::nMassBins,DYTools::nYBinsMax);
-  TMatrixD accv     (DYTools::nMassBins,DYTools::nYBinsMax);
-  TMatrixD accErrv  (DYTools::nMassBins,DYTools::nYBinsMax);
+  TMatrixD nEventsv (DYTools::nMassBins,DYTools::npTBinsMax);  
+  TMatrixD nPassv   (DYTools::nMassBins,DYTools::npTBinsMax);
+  TMatrixD accv     (DYTools::nMassBins,DYTools::npTBinsMax);
+  TMatrixD accErrv  (DYTools::nMassBins,DYTools::npTBinsMax);
 
-  TMatrixD nPassBBv(DYTools::nMassBins,DYTools::nYBinsMax), accBBv(DYTools::nMassBins,DYTools::nYBinsMax), accErrBBv(DYTools::nMassBins,DYTools::nYBinsMax); 
-  TMatrixD nPassBEv(DYTools::nMassBins,DYTools::nYBinsMax), accBEv(DYTools::nMassBins,DYTools::nYBinsMax), accErrBEv(DYTools::nMassBins,DYTools::nYBinsMax); 
-  TMatrixD nPassEEv(DYTools::nMassBins,DYTools::nYBinsMax), accEEv(DYTools::nMassBins,DYTools::nYBinsMax), accErrEEv(DYTools::nMassBins,DYTools::nYBinsMax);
+  TMatrixD nPassBBv(DYTools::nMassBins,DYTools::npTBinsMax), accBBv(DYTools::nMassBins,DYTools::npTBinsMax), accErrBBv(DYTools::nMassBins,DYTools::npTBinsMax); 
+  TMatrixD nPassBEv(DYTools::nMassBins,DYTools::npTBinsMax), accBEv(DYTools::nMassBins,DYTools::npTBinsMax), accErrBEv(DYTools::nMassBins,DYTools::npTBinsMax); 
+  TMatrixD nPassEEv(DYTools::nMassBins,DYTools::npTBinsMax), accEEv(DYTools::nMassBins,DYTools::npTBinsMax), accErrEEv(DYTools::nMassBins,DYTools::npTBinsMax);
 
   // Vectors for calculation of errors with weighted sums
-  TMatrixD w2Eventsv (DYTools::nMassBins,DYTools::nYBinsMax);  
-  TMatrixD w2Passv   (DYTools::nMassBins,DYTools::nYBinsMax);
+  TMatrixD w2Eventsv (DYTools::nMassBins,DYTools::npTBinsMax);  
+  TMatrixD w2Passv   (DYTools::nMassBins,DYTools::npTBinsMax);
 
 
   nEventsv = 0;
@@ -267,9 +267,10 @@ void plotDYAcceptance(const TString input, int systematicsMode = DYTools::NORMAL
       double mass = gen->mass;    // post-FSR
       //double yPreFsr = gen->vy;   // pre-FSR
       double y = gen->y;    // post-FSR
+      double pt = gen->pt;    				//C: I added this
 
       if ((mass < massLow) || (mass > massHigh)) continue;
-      if ((fabs(y) < DYTools::yRangeMin) || (fabs(y) > DYTools::yRangeMax)) continue;
+      if ((fabs(pt) < DYTools::pTRangeMin) || (fabs(pt) > DYTools::pTRangeMax)) continue;  //C: changed
 
       double reweight;
       if (systematicsMode!=DYTools::FSR_STUDY) reweight=1.0;
@@ -284,18 +285,18 @@ void plotDYAcceptance(const TString input, int systematicsMode = DYTools::NORMAL
       if(ibinM1DPreFsr == -1 && 
 	 massPreFsr >= DYTools::_massBinLimits2011[DYTools::_nMassBins2011] ) {
 	ibinM1DPreFsr = DYTools::_nMassBins2011-1;
-      }
+      }Y
 
       int ibinMass = DYTools::findMassBin(mass);
       //int ibinMassPreFsr = DYTools::findMassBin(massPreFsr);
-      int ibinY = DYTools::findAbsYBin(ibinMass, y);
-      //int ibinYPreFsr = DYTools::findAbsYBin(ibinMassPreFsr, yPreFsr);
+      int ibinpT = DYTools::findAbspTBin(ibinMass, pt); 			//C: I should changed this to pt
+      //int ibinpTPreFsr = DYTools::findAbspTBin(ibinMassPreFsr, yPreFsr);
 
       // We are only interested in the events, reconstructed with 
       // good mass and rapidity 
       // Note: this eliminates the need to check ranges later on
-      if (ibinMass==-1 || ibinMass>=DYTools::nMassBins || ibinY==-1) {
-	//printf(".. skipping mass=%6.4lf, y=%6.4lf. ibinMass=%d, ibinY=%d\n",mass,y,ibinMass,ibinY);
+      if (ibinMass==-1 || ibinMass>=DYTools::nMassBins || ibinpT==-1) {
+	//printf(".. skipping mass=%6.4lf, y=%6.4lf. ibinMass=%d, ibinpT=%d\n",mass,y,ibinMass,ibinpT);
 	continue;
       }
 
@@ -346,8 +347,8 @@ void plotDYAcceptance(const TString input, int systematicsMode = DYTools::NORMAL
 
       if(ibinMass != -1 && ibinMass < nEventsv.GetNrows()){
 	double fullWeight = reweight * scale * gen->weight * fewz_weight * puWeight;
-	nEventsv(ibinMass,ibinY) += fullWeight;
-	w2Eventsv(ibinMass,ibinY) += fullWeight*fullWeight;
+	nEventsv(ibinMass,ibinpT) += fullWeight;
+	w2Eventsv(ibinMass,ibinpT) += fullWeight*fullWeight;
       }else if(ibinMass >= nEventsv.GetNrows())
 	cout << "ERROR: binning problem" << endl;
 
@@ -361,11 +362,11 @@ void plotDYAcceptance(const TString input, int systematicsMode = DYTools::NORMAL
 	
 	if(ibinMass != -1 && ibinMass < nPassv.GetNrows()){
 	  double fullWeight = reweight * scale * gen->weight * fewz_weight * puWeight;
-	  nPassv(ibinMass,ibinY) += fullWeight;
-	  w2Passv(ibinMass,ibinY) += fullWeight*fullWeight;
-	  if(isB1 && isB2)                          { nPassBBv(ibinMass,ibinY) += reweight * scale * gen->weight * fewz_weight * puWeight; } 
-	  else if(isE1 && isE2)                     { nPassEEv(ibinMass,ibinY) += reweight * scale * gen->weight * fewz_weight * puWeight; } 
-	  else if((isB1 && isE2) || (isE1 && isB2)) { nPassBEv(ibinMass,ibinY) += reweight * scale * gen->weight * fewz_weight * puWeight; }
+	  nPassv(ibinMass,ibinpT) += fullWeight;
+	  w2Passv(ibinMass,ibinpT) += fullWeight*fullWeight;
+	  if(isB1 && isB2)                          { nPassBBv(ibinMass,ibinpT) += reweight * scale * gen->weight * fewz_weight * puWeight; } 
+	  else if(isE1 && isE2)                     { nPassEEv(ibinMass,ibinpT) += reweight * scale * gen->weight * fewz_weight * puWeight; } 
+	  else if((isB1 && isE2) || (isE1 && isB2)) { nPassBEv(ibinMass,ibinpT) += reweight * scale * gen->weight * fewz_weight * puWeight; }
 	}
       }
       hZMassv[ifile]->Fill(mass,reweight * scale * gen->weight * fewz_weight * puWeight);
@@ -390,7 +391,7 @@ void plotDYAcceptance(const TString input, int systematicsMode = DYTools::NORMAL
   accErrEEv = 0;
 
   for(int i=0; i<DYTools::nMassBins; i++)
-    for (int j=0; j<DYTools::nYBins[i]; j++)
+    for (int j=0; j<DYTools::npTBins[i]; j++)
       {
         if(nEventsv(i,j) != 0)
           {

@@ -1230,6 +1230,18 @@ void makeUnfoldingMatrixFsr(const TString input,
   //fsrDET_Mdf.computeResponseMatrix_MdfBeforeNormalization(fsrDETexact);
   fsrDET_Mdf.computeResponseMatrix_Mdf(fsrDETexact);
   fsrDET_good.computeResponseMatrix();
+  
+  cout << "Easy to find!!!\n";
+  
+  detResponse.printResponse();
+  detResponseExact.printResponse();
+  fsrGood.printResponse();
+  fsrExact.printResponse();
+  fsrDET.printResponse();
+  fsrDETexact.printResponse();
+  fsrDET_Mdf.printResponse();
+  fsrDET_good.printResponse();
+  
 
   std::cout << "find inverted response matrix" << std::endl;
   detResponse.invertResponseMatrix();

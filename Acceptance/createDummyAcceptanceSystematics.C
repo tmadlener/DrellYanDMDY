@@ -53,9 +53,9 @@ void createDummyAcceptanceSystematics(const TString conf){
   //calculate Fsr systematics 
   /////////////////////////////////
 
-  TMatrixD accFsrMax(DYTools::nMassBins,DYTools::nYBinsMax);
-  TMatrixD accFsrMin(DYTools::nMassBins,DYTools::nYBinsMax);
-  TMatrixD accSystPercentFsr(DYTools::nMassBins,DYTools::nYBinsMax);
+  TMatrixD accFsrMax(DYTools::nMassBins,DYTools::npTBinsMax);
+  TMatrixD accFsrMin(DYTools::nMassBins,DYTools::npTBinsMax);
+  TMatrixD accSystPercentFsr(DYTools::nMassBins,DYTools::npTBinsMax);
   accFsrMax = 0;
   accFsrMin = 0;
   accSystPercentFsr = 0;

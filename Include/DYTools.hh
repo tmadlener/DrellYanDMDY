@@ -291,7 +291,7 @@ namespace DYTools {
       double dpT=((pTRangeMax-pTRangeMin)/double(npTBinsThisMassRange));
       //std::cout << "pT=" << pT << ", dpT=" << dpT  << ", binIdx=" << result << ", pTRange=" << (result*dpT) << ".." << (result*dpT+dpT) << "\n";
       if (result < 0 || result >= npTBinsThisMassRange) {
-	std::cout << "pT=" << pT << ", dpT=" << dpT  << ", binIdx=" << result << ", pTRange=" << (result*dpT) << ".." << (result*dpT+dpT) << "\n";
+	std::cout << "pT=" << pT << ", dpT=" << dpT  << ", binIdx=" << result << ", pTRange=" << (result*dpT+pTRangeMin) << ".." << (result*dpT+dpT+pTRangeMin) << "\n";
 	result=-1;
       }
     }
