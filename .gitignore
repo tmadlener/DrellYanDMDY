@@ -3,3 +3,10 @@
 *.so
 *.pcm
 *.png
+
+EventScaleFactors/log*.out
+logs-2D/
+*/plots2D/
+*/plots2D_PU/
+FullChain/*.log
+FullChain/*.out
