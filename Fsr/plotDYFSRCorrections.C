@@ -119,11 +119,11 @@ void plotDYFSRCorrections(const TString input, bool sansAcc=0, int debugMode=0)
   
   UInt_t   nZ = 0;
   Double_t nZweighted=0;
-  TMatrixD nEventsv (DYTools::nMassBins,DYTools::nYBinsMax);
-  TMatrixD nPassv   (DYTools::nMassBins,DYTools::nYBinsMax);
-  TMatrixD nCorrelv  (DYTools::nMassBins,DYTools::nYBinsMax);
-  TMatrixD corrv     (DYTools::nMassBins,DYTools::nYBinsMax);
-  TMatrixD corrErrv  (DYTools::nMassBins,DYTools::nYBinsMax);
+  TMatrixD nEventsv (DYTools::nMassBins,DYTools::npTBinsMax);
+  TMatrixD nPassv   (DYTools::nMassBins,DYTools::npTBinsMax);
+  TMatrixD nCorrelv  (DYTools::nMassBins,DYTools::npTBinsMax);
+  TMatrixD corrv     (DYTools::nMassBins,DYTools::npTBinsMax);
+  TMatrixD corrErrv  (DYTools::nMassBins,DYTools::npTBinsMax);
 
   nEventsv = 0;
   nPassv = 0;
@@ -227,7 +227,7 @@ void plotDYFSRCorrections(const TString input, bool sansAcc=0, int debugMode=0)
       if((mass < massLow) || (mass > massHigh)) continue;
       double y = gen->vy;    // pre-FSR
       double yPostFsr = gen->y;    // post-FSR
-      if((fabs(y) < DYTools::yRangeMin) || (fabs(y) > DYTools::yRangeMax)) continue;
+      if((fabs(y) < DYTools::pTRangeMin) || (fabs(y) > DYTools::pTRangeMax)) continue;
 
       int ibinM1D = DYTools::_findMassBin2011(mass);      // temporary
       // If mass is larger than the highest bin boundary
@@ -243,8 +243,8 @@ void plotDYFSRCorrections(const TString input, bool sansAcc=0, int debugMode=0)
 	ibinM = DYTools::nMassBins-1;
       int ibinMPostFsr = DYTools::findMassBin(massPostFsr);
 
-      int ibinY = DYTools::findAbsYBin(ibinM,y);
-      int ibinYPostFsr = DYTools::findAbsYBin(ibinMPostFsr,yPostFsr);
+      int ibinY = DYTools::findAbspTBin(ibinM,y);
+      int ibinYPostFsr = DYTools::findAbspTBin(ibinMPostFsr,yPostFsr);
 
       // Find FEWZ-powheg reweighting factor 
       // that depends on pre-FSR Z/gamma* rapidity and pt
@@ -275,18 +275,18 @@ void plotDYFSRCorrections(const TString input, bool sansAcc=0, int debugMode=0)
      //       printf("mass= %f   pt= %f    Y= %f     weight= %f\n",gen->mass, gen->vpt, gen->vy, fewz_weight);
       }
 
-      if(ibinM != -1 && ibinM<DYTools::nMassBins && ibinY!=-1 && ibinY<DYTools::nYBins[ibinM]) {
+      if(ibinM != -1 && ibinM<DYTools::nMassBins && ibinY!=-1 && ibinY<DYTools::npTBins[ibinM]) {
 	//std::cout << "presel: ientry=" << ientry << ", ibinM=" << ibinM << ", ibinY=" << ibinY << ", weight=" << (scale * gen->weight * fewz_weight) << "\n";
 	nEventsv(ibinM,ibinY) += scale * gen->weight * fewz_weight;
       }
-      else if(ibinM >= DYTools::nMassBins || ibinY>=DYTools::nYBins[ibinM])
+      else if(ibinM >= DYTools::nMassBins || ibinY>=DYTools::npTBins[ibinM])
         binProblemPreFsr++;
 
       if(ibinMPostFsr!=-1 && ibinMPostFsr<DYTools::nMassBins &&  ibinYPostFsr!=-1 
-	 && ibinYPostFsr<DYTools::nYBins[ibinMPostFsr])
+	 && ibinYPostFsr<DYTools::npTBins[ibinMPostFsr])
 	nPassv(ibinMPostFsr,ibinYPostFsr) += scale * gen->weight * fewz_weight;
       else if(ibinMPostFsr >= DYTools::nMassBins || 
-	      ibinYPostFsr>=DYTools::nYBins[ibinMPostFsr]) {
+	      ibinYPostFsr>=DYTools::npTBins[ibinMPostFsr]) {
 	// Do nothing: post-fsr mass could easily be below the lowest edge of mass range
         binProblemPostFsr++;
       }
@@ -294,9 +294,9 @@ void plotDYFSRCorrections(const TString input, bool sansAcc=0, int debugMode=0)
       if (ibinM==ibinMPostFsr && ibinY==ibinYPostFsr)
         {
           if(ibinM != -1 && ibinM<DYTools::nMassBins && ibinY!=-1 && 
-	     ibinY<DYTools::nYBins[ibinM])
+	     ibinY<DYTools::npTBins[ibinM])
             nCorrelv(ibinM,ibinY) += scale * gen->weight * fewz_weight;
-          else if(ibinM >= DYTools::nMassBins || ibinY>=DYTools::nYBins[ibinM])
+          else if(ibinM >= DYTools::nMassBins || ibinY>=DYTools::npTBins[ibinM])
             binProblemCorrel++;
         }
 
@@ -318,7 +318,7 @@ void plotDYFSRCorrections(const TString input, bool sansAcc=0, int debugMode=0)
   corrv      = 0;
   corrErrv   = 0;
   for(int i=0; i<DYTools::nMassBins; i++)
-    for (int j=0; j<DYTools::nYBins[i]; j++)
+    for (int j=0; j<DYTools::npTBins[i]; j++)
       {
         if(nEventsv(i,j) != 0)
           {

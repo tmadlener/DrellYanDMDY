@@ -109,7 +109,7 @@ void drawEventScaleFactorsFI(TVectorD scaleRecoFIV, TVectorD scaleRecoErrFIV,
 			     TVectorD scaleIdFIV , TVectorD scaleIdErrFIV ,
 			     TVectorD scaleHltFIV, TVectorD scaleHltErrFIV,
 			     TVectorD scaleV   , TVectorD scaleErrFIV   ,
-			     int rapidityBinIndex0,
+			     int pTBinIndex0,
 			     TFile *fRoot,
 			     std::vector<CPlot*> *cplotV=NULL);
 void drawEventScaleFactorGraphs(TGraphErrors *gr, TString yAxisTitle, 
@@ -324,7 +324,7 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
   hScaleHltFIV.reserve(nUnfoldingBins);
 
   for(int i=0; i<DYTools::nMassBins; i++){
-    double *rapidityBinLimits=DYTools::getYBinLimits(i);
+    double *pTBinLimits=DYTools::getpTBinLimits(i);
 
     TString base = TString("hScaleV_massBin");
     base += i;
@@ -345,10 +345,10 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
     base += i;
     hElectronEtV.push_back(new TH1F(base,base,etBinCount, etBinLimits));
     
-    for (int yi=0; yi<DYTools::nYBins[i]; ++yi) {
+    for (int pTi=0; pTi<DYTools::npTBins[i]; ++pTi) {
       char buf[50];
       sprintf(buf,"mIdx%d_y%4.2lf-%4.2lf",
-	      i,rapidityBinLimits[yi],rapidityBinLimits[yi+1]);
+	      i,pTBinLimits[pTi],pTBinLimits[pTi+1]);
       TString idxStr=buf;
       idxStr.ReplaceAll(".","_");
       base = TString("hScaleV_")+idxStr;
@@ -360,7 +360,7 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
       hScaleHltFIV.push_back(new TH1F(base+TString("_hlt"),
 				      base+TString("_hlt"),150,0.0,1.5));
     }
-    delete rapidityBinLimits;
+    delete pTBinLimits;
   }
 
   // Create Gaussian-distributed random offsets for each pseudo-experiment
@@ -770,8 +770,8 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
 			  triggers.triggerConditionsName() + puStr +
 			  TString(".root"));
 
-  TMatrixD scaleMatrix(DYTools::nMassBins,DYTools::nYBinsMax);
-  TMatrixD scaleMatrixErr(DYTools::nMassBins,DYTools::nYBinsMax);
+  TMatrixD scaleMatrix(DYTools::nMassBins,DYTools::npTBinsMax);
+  TMatrixD scaleMatrixErr(DYTools::nMassBins,DYTools::npTBinsMax);
   unfolding::deflattenMatrix(scaleFIV, scaleMatrix);
   unfolding::deflattenMatrix(scaleMeanErrFIV, scaleMatrixErr);
 
@@ -811,7 +811,7 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
 
     // omit the underflow mass bin in 2D case
     const int iMmin=(DYTools::study2D==0) ? 0 : 1;
-    const int idxMin= iMmin * DYTools::nYBins[0];
+    const int idxMin= iMmin * DYTools::npTBins[0];
     const int nCorrelationBins=nUnfoldingBins-idxMin;
 
     TH2F *hCorrelation=new TH2F("hCorrelation","hCorrelation",nCorrelationBins,0.5,nCorrelationBins+0.5,nCorrelationBins,0.5,nCorrelationBins+0.5);
@@ -837,9 +837,9 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
     }
     
     for (int iM=iMmin, i=idxMin; iM<DYTools::nMassBins; ++iM) {
-      for (int iY=0; (iY<DYTools::nYBins[iM]) && (i<nUnfoldingBins); ++iY, ++i) {
+      for (int iY=0; (iY<DYTools::npTBins[iM]) && (i<nUnfoldingBins); ++iY, ++i) {
 	for (int jM=iMmin, j=idxMin; jM<DYTools::nMassBins; ++jM) {
-	  for (int jY=0; (jY<DYTools::nYBins[jM]) && (j<nUnfoldingBins); ++jY, ++j) {
+	  for (int jY=0; (jY<DYTools::npTBins[jM]) && (j<nUnfoldingBins); ++jY, ++j) {
 	    TString nameHESF= Form("hESF_%d_%d__iM%d_iY%d__jM%d_jY%d",i-idxMin,j-idxMin,iM-iMmin,iY,jM-iMmin,jY);
 	    TString nameHESF_Norm= Form("hESFNorm_%d_%d__iM%d_iY%d__jM%d_jY%d",i-idxMin,j-idxMin,iM-iMmin,iY,jM-iMmin,jY);
 	    if (debugMode) HERE(nameHESF.Data());
@@ -955,20 +955,20 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
   }
 
   if (1) {
-    std::cout << "\nScale factors as a function of mass and rapidity bin\n";
-    std::cout << "    mass     rapidity     rho_reco          rho_id"
+    std::cout << "\nScale factors as a function of mass and pT bin\n";
+    std::cout << "    mass     pT     rho_reco          rho_id"
 	      << "       rho_hlt        rho_total\n";
     std::string format2=
       std::string("   %3.0f - %3.0f  %4.2f-%4.2f     %5.3f +- %5.3f    %5.3f +- %5.3f")+
       std::string("     %5.3f +- %5.3f     %5.3f +- %5.3f\n");
     for(int i=0; i<DYTools::nMassBins; i++){
-      double *rapidityBinLimits=DYTools::getYBinLimits(i);
-      for (int yi=0; yi<DYTools::nYBins[i]; ++yi) {
-	int idx=DYTools::findIndexFlat(i,yi);
+      double *pTBinLimits=DYTools::getpTBinLimits(i);
+      for (int pTi=0; pTi<DYTools::npTBins[i]; ++pTi) {
+	int idx=DYTools::findIndexFlat(i,pTi);
 	std::cout << "idx=" << idx << "\n";
 	printf(format2.c_str(),
 	       DYTools::massBinLimits[i], DYTools::massBinLimits[i+1],
-	       rapidityBinLimits[yi], rapidityBinLimits[yi+1],
+	       pTBinLimits[pTi], pTBinLimits[pTi+1],
 	       hScaleRecoFIV[idx]->GetMean(), scaleMeanRecoErrFIV[idx],
 	       hScaleIdFIV[idx]->GetMean(),  scaleMeanIdErrFIV[idx],
 	       hScaleHltFIV[idx]->GetMean(), scaleMeanHltErrFIV[idx],
@@ -986,10 +986,10 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
 			scaleV   , scaleMeanErrV   ,
 			faPlots);
 
-  const int rapidityIdxCount= (DYTools::study2D==1) ? 3 : 1;
-  const int rapidityIdx_2D[] = { 0, 10, 20 };
-  const int rapidityIdx_1D[] = {0};
-  const int *rapidityIdx = (DYTools::study2D==1) ? rapidityIdx_2D : rapidityIdx_1D;
+  const int pTIdxCount= (DYTools::study2D==1) ? 3 : 1;
+  const int pTIdx_2D[] = { 0, 10, 20 };
+  const int pTIdx_1D[] = {0};
+  const int *pTIdx = (DYTools::study2D==1) ? pTIdx_2D : pTIdx_1D;
   if (1) {
     std::vector<CPlot*> cplotsV;
     if (1) {
@@ -1006,12 +1006,12 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
 	cplotsV[i]->AddLine(0,1.0, 1500,1.0, kBlack, kDashed);
       }
     }
-    for (int ri=0; ri<rapidityIdxCount; ++ri) {
+    for (int ri=0; ri<pTIdxCount; ++ri) {
       drawEventScaleFactorsFI(scaleRecoFIV, scaleMeanRecoErrFIV,
 			      scaleIdFIV , scaleMeanIdErrFIV ,
 			      scaleHltFIV, scaleMeanHltErrFIV,
 			      scaleFIV   , scaleMeanErrFIV   ,
-			      rapidityIdx[ri],
+			      pTIdx[ri],
 			      faPlots, &cplotsV
 			      );
     }
@@ -1290,7 +1290,7 @@ int createSelectionFile(const MCInputFileMgr_t &mcMgr,
 	double weight=sample_weight;
 	if (useFewzWeights) weight *= fewz.getWeight(gen->vmass,gen->vpt,gen->vy);
 	selData.assign(gen->mass, gen->y,
-		       dielectron->mass, dielectron->y,
+		       dielectron->mass, dielectron->y, 				//C: Do I need to change this?
 		       leading->scEt, leading->scEta,
 		       trailing->scEt, trailing->scEta,
 		       weight,
@@ -1888,7 +1888,7 @@ void drawEventScaleFactorsFI(TVectorD scaleRecoFIV, TVectorD scaleRecoErrFIV,
 			     TVectorD scaleIdFIV , TVectorD scaleIdErrFIV ,
 			     TVectorD scaleHltFIV, TVectorD scaleHltErrFIV,
 			     TVectorD scaleFIV   , TVectorD scaleErrFIV   ,
-			     int rapidityIndex,
+			     int pTIndex,
 			     TFile *fRoot,
 			     std::vector<CPlot*> *cplotV)
 {
@@ -1911,22 +1911,22 @@ void drawEventScaleFactorsFI(TVectorD scaleRecoFIV, TVectorD scaleRecoErrFIV,
   double scaleHltErrA[DYTools::nMassBins];
   double scaleErrA   [DYTools::nMassBins];
 
-  double rapidity=-999;
+  double pT=-999;
   {
-    double *rapidityBinLimits=DYTools::getYBinLimits(0);
-    rapidity=0.5*
-      (rapidityBinLimits[rapidityIndex]+rapidityBinLimits[rapidityIndex+1]);
-    delete rapidityBinLimits;
+    double *pTBinLimits=DYTools::getpTBinLimits(0);
+    pT=0.5*
+      (pTBinLimits[pTIndex]+pTBinLimits[pTIndex+1]);
+    delete pTBinLimits;
   }
   for(int i=0; i<DYTools::nMassBins; i++){
-    int idx=DYTools::findIndexFlat(i,rapidityIndex);
+    int idx=DYTools::findIndexFlat(i,pTIndex);
     if (idx<0) {
-      std::cout <<"drawEventScaleFactorsFI: massBin=" << i << ", rapidityIndex=" << rapidityIndex << "(supplied to subroutine), idx=" << idx << std::endl;
+      std::cout <<"drawEventScaleFactorsFI: massBin=" << i << ", pTIndex=" << pTIndex << "(supplied to subroutine), idx=" << idx << std::endl;
       return;
     }
     if (i==DYTools::nMassBins-1) {
       // last mass bins is special
-      idx=DYTools::findIndexFlat(i, DYTools::findAbsYBin(i,rapidity));
+      idx=DYTools::findIndexFlat(i, DYTools::findAbspTBin(i,pT));
     }
     x[i] = (DYTools::massBinLimits[i] + DYTools::massBinLimits[i+1])/2.0;
     dx[i]= (DYTools::massBinLimits[i+1] - DYTools::massBinLimits[i])/2.0;
@@ -1950,10 +1950,10 @@ void drawEventScaleFactorsFI(TVectorD scaleRecoFIV, TVectorD scaleRecoErrFIV,
     new TGraphErrors(DYTools::nMassBins, x, scaleHltA, dx, scaleHltErrA);
 
   char buf[20];
-  sprintf(buf,"_y=%4.2lf_",rapidity); // for file name
+  sprintf(buf,"_y=%4.2lf_",pT); // for file name
   TString yStr=buf;
   yStr.ReplaceAll(".","_"); yStr.ReplaceAll("=","_");
-  sprintf(buf,"|y|=%4.2lf",rapidity); // for label
+  sprintf(buf,"|y|=%4.2lf",pT); // for label
   TString plotName;
   TString plotNameBase = 
     TString("plot_event_scale_") + DYTools::analysisTag + TString("_") + yStr;

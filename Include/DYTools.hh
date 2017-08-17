@@ -76,10 +76,10 @@ namespace DYTools {
 
   // Constants that define binning in mass and rapidity
   // Note: bin zero is underflow, overflow is neglected
-  const int _nMassBins2D = 7;
+  const int _nMassBins2D = 6;
   const double _massBinLimits2D[_nMassBins2D+1] = 
-    {0, // first bin is underflow
-     20, 30, 40, 50, 60, 120, 1500
+    {10, // first bin is underflow
+     30, 40, 50, 60, 120, 1500
     }; // overflow is very unlikely, do not account for it
   // Rapidity binning is different for different mass bins
   // Note: this implementation neglects underflow and overflow
@@ -98,7 +98,7 @@ namespace DYTools {
   const int _npTBinsMax2D   = (energy8TeV == 1) ? 24 : 25; // max Y bins in a mass range. This should be improved, too many hardwired numbers.
   const int _npTBins2D[_nMassBins2D] = 
     { nBinspTLowMass,// underflow, binned like first mass bin 
-      nBinspTLowMass, nBinspTLowMass, nBinspTLowMass, nBinspTLowMass, nBinspTLowMass, 
+      nBinspTLowMass, nBinspTLowMass, nBinspTLowMass, nBinspTLowMass, 
       nBinspTHighMass
     }; // overflow is neglected
 

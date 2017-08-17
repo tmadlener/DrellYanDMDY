@@ -285,7 +285,7 @@ void plotDYAcceptance(const TString input, int systematicsMode = DYTools::NORMAL
       if(ibinM1DPreFsr == -1 && 
 	 massPreFsr >= DYTools::_massBinLimits2011[DYTools::_nMassBins2011] ) {
 	ibinM1DPreFsr = DYTools::_nMassBins2011-1;
-      }Y
+      }
 
       int ibinMass = DYTools::findMassBin(mass);
       //int ibinMassPreFsr = DYTools::findMassBin(massPreFsr);
