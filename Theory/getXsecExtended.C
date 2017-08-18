@@ -84,9 +84,9 @@ TH1F* plotXsec1D(const char *hname, const TMatrixD &nEvents, const TMatrixD &nEv
     h->SetDirectory(0);
     for (int iM=0; iM<DYTools::nMassBins; ++iM) {
       double sum=0., sumW2=0.;
-      for (int iY=0; iY<DYTools::nYBins[iM]; ++iY) {
-	sum+= nEvents[iM][iY];
-	sumW2+= nEventsErr[iM][iY];
+      for (int ipT=0; ipT<DYTools::npTBins[iM]; ++ipT) {
+	sum+= nEvents[iM][ipT];
+	sumW2+= nEventsErr[iM][ipT];
       }
       h->SetBinContent(iM+1, sum);
       h->SetBinError(iM+1, sqrt(sumW2));
@@ -105,11 +105,11 @@ TH1F* plotXsec2D(const char *name_base, int iM, const TMatrixD &nEvents, const T
   double massMin=DYTools::massBinLimits[iM];
   double massMax=DYTools::massBinLimits[iM+1];
   TString hname=Form("%s_mass_%2.0lf_%2.0lf",name_base,massMin,massMax);
-  TH1F *h=new TH1F(hname,hname, DYTools::nYBins[iM], DYTools::yRangeMin,DYTools::yRangeMax);
+  TH1F *h=new TH1F(hname,hname, DYTools::npTBins[iM], DYTools::pTRangeMin,DYTools::pTRangeMax);
   h->SetDirectory(0);
-  for (int iY=0; iY<DYTools::nYBins[iM]; ++iY) {
-    h->SetBinContent(iY+1, nEvents[iM][iY]);
-    h->SetBinError(iY+1, sqrt(nEventsErr[iM][iY]));
+  for (int iPt=0; iPt<DYTools::npTBins[iM]; ++iPt) {
+    h->SetBinContent(iPt+1, nEvents[iM][iPt]);
+    h->SetBinError(iPt+1, sqrt(nEventsErr[iM][iPt]));
   }
   if (cp) {
     cp->AddHist1D(h,TString(name_base),"L",color,1,0,1);
@@ -304,12 +304,12 @@ void getXsecExtended(const TString mc_input, int debugMode=0, bool useFEWZ=true,
   
   Double_t   nZv = 0;
 
-  TMatrixD nEvents (locMassBinCount,DYTools::nYBinsMax);    // number of weigthed events
-  TMatrixD nEventsDET (locMassBinCount,DYTools::nYBinsMax); // number of weighted events in the detector acceptance
-  TMatrixD nEventsDETrecoPostIdx (locMassBinCount,DYTools::nYBinsMax);    // number of weigthed events
-  TMatrixD w2Events (locMassBinCount,DYTools::nYBinsMax);
-  TMatrixD w2EventsDET (locMassBinCount,DYTools::nYBinsMax);
-  TMatrixD w2EventsDETrecoPostIdx (locMassBinCount,DYTools::nYBinsMax);
+  TMatrixD nEvents (locMassBinCount,DYTools::npTBinsMax);    // number of weigthed events
+  TMatrixD nEventsDET (locMassBinCount,DYTools::npTBinsMax); // number of weighted events in the detector acceptance
+  TMatrixD nEventsDETrecoPostIdx (locMassBinCount,DYTools::npTBinsMax);    // number of weigthed events
+  TMatrixD w2Events (locMassBinCount,DYTools::npTBinsMax);
+  TMatrixD w2EventsDET (locMassBinCount,DYTools::npTBinsMax);
+  TMatrixD w2EventsDETrecoPostIdx (locMassBinCount,DYTools::npTBinsMax);
   Double_t nZpeak=0, w2Zpeak=0;
   double nZpeakDET=0, w2ZpeakDET=0;
   double nZpeakDETrecoPostIdx=0, w2ZpeakDETrecoPostIdx=0;
@@ -381,28 +381,28 @@ void getXsecExtended(const TString mc_input, int debugMode=0, bool useFEWZ=true,
       if (ientry%1000000==0) printProgress("ientry=",ientry,eventTree->GetEntriesFast());
 
       double massPreFsr = gen->vmass;   // pre-FSR
-      double yPreFsr = gen->vy;    // pre-FSR
+      double ptPreFsr = gen->vpt;    // pre-FSR
       double massPostFsr = gen->mass;   // post-FSR
-      double yPostFsr = gen->y;    // post-FSR
+      double ptPostFsr = gen->pt;    // post-FSR
 
       if ((massPreFsr < massLow) || (massPreFsr > massHigh)) continue;
-      if ((fabs(yPreFsr) < DYTools::yRangeMin) || 
-	  (fabs(yPreFsr) > DYTools::yRangeMax)) continue;
+      if ((fabs(ptPreFsr) < DYTools::pTRangeMin) || 
+	  (fabs(ptPreFsr) > DYTools::pTRangeMax)) continue;
 
-      int ibinMassPreFsr=-1, ibinYPreFsr=-1;
-      int ibinMassPostFsr=-1, ibinYPostFsr=-1;
+      int ibinMassPreFsr=-1, ibinPtPreFsr=-1;
+      int ibinMassPostFsr=-1, ibinPtPostFsr=-1;
 
       if (!fineGrid) {
 	ibinMassPreFsr = DYTools::findMassBin(massPreFsr);
 	ibinMassPostFsr= DYTools::findMassBin(massPostFsr);
-	ibinYPreFsr = DYTools::findAbsYBin(ibinMassPreFsr, yPreFsr);
-	ibinYPostFsr= DYTools::findAbsYBin(ibinMassPostFsr, yPostFsr);
+	ibinPtPreFsr = DYTools::findAbspTBin(ibinMassPreFsr, ptPreFsr);
+	ibinPtPostFsr= DYTools::findAbspTBin(ibinMassPostFsr, ptPostFsr);
       }
       else {
 	ibinMassPreFsr=hMassIdx.FindBin(massPreFsr)-1;
 	ibinMassPostFsr=hMassIdx.FindBin(massPostFsr)-1;
-	ibinYPreFsr=0;
-	ibinYPostFsr=0;
+	ibinPtPreFsr=0;
+	ibinPtPostFsr=0;
 	//printf("massPreFsr=%8.4lf, idx=%3d;  massPostFsr=%8.4lf, idx=%3d\n", massPreFsr,ibinMassPreFsr, massPostFsr,ibinMassPostFsr);
       }
 
@@ -410,8 +410,8 @@ void getXsecExtended(const TString mc_input, int debugMode=0, bool useFEWZ=true,
       // good mass and rapidity 
       if (ibinMassPreFsr==-1 || 
 	  ibinMassPreFsr>=locMassBinCount || 
-	  ibinYPreFsr==-1) {
-	printf(".. skipping mass=%6.4lf, y=%6.4lf. ibinMass=%d, ibinY=%d\n",massPreFsr,yPreFsr,ibinMassPreFsr,ibinYPreFsr);
+	  ibinPtPreFsr==-1) {
+	printf(".. skipping mass=%6.4lf, y=%6.4lf. ibinMass=%d, ibinPt=%d\n",massPreFsr,ptPreFsr,ibinMassPreFsr,ibinPtPreFsr);
 	continue;
       }
 
@@ -425,22 +425,22 @@ void getXsecExtended(const TString mc_input, int debugMode=0, bool useFEWZ=true,
 
       //std::cout << "weight=scale*gen->weight*fewz: " << scale << " * " << gen->weight << " * " << fewz_weight << "\n";
       double fullWeight = scale * gen->weight * fewz_weight;
-      nEvents(ibinMassPreFsr,ibinYPreFsr) += fullWeight;
-      w2Events(ibinMassPreFsr,ibinYPreFsr) += fullWeight*fullWeight;
+      nEvents(ibinMassPreFsr,ibinPtPreFsr) += fullWeight;
+      w2Events(ibinMassPreFsr,ibinPtPreFsr) += fullWeight*fullWeight;
 
       // Pre-FSR cross section
       if( DYTools::goodEtPair(gen->vpt_1, gen->vpt_2) &&
 	  DYTools::goodEtaPair(gen->veta_1, gen->veta_2) ) {
-	nEventsDET(ibinMassPreFsr,ibinYPreFsr) += fullWeight;
-	w2EventsDET(ibinMassPreFsr,ibinYPreFsr) += fullWeight*fullWeight;
+	nEventsDET(ibinMassPreFsr,ibinPtPreFsr) += fullWeight;
+	w2EventsDET(ibinMassPreFsr,ibinPtPreFsr) += fullWeight*fullWeight;
       }
 
       // Post-FSR cross section
-      if(  (ibinMassPostFsr!=-1) && (ibinYPostFsr!=-1) &&
+      if(  (ibinMassPostFsr!=-1) && (ibinPtPostFsr!=-1) &&
 	   DYTools::goodEtPair(gen->pt_1, gen->pt_2) &&
 	   DYTools::goodEtaPair(gen->eta_1, gen->eta_2) ) {
-	nEventsDETrecoPostIdx(ibinMassPostFsr,ibinYPostFsr) += fullWeight;
-	w2EventsDETrecoPostIdx(ibinMassPostFsr,ibinYPostFsr) += fullWeight*fullWeight;
+	nEventsDETrecoPostIdx(ibinMassPostFsr,ibinPtPostFsr) += fullWeight;
+	w2EventsDETrecoPostIdx(ibinMassPostFsr,ibinPtPostFsr) += fullWeight*fullWeight;
       }
     }
     delete infile;
@@ -455,7 +455,7 @@ void getXsecExtended(const TString mc_input, int debugMode=0, bool useFEWZ=true,
     if ((hMassIdx.GetBinLowEdge(i+1)>=60-1e-3) 
 	&& (hMassIdx.GetBinLowEdge(i+1+1)<=120+1e-3)) isZpeak=1;
     if (isZpeak) {
-      int yiMax=(fineGrid) ? 1:DYTools::nYBins[i];
+      int yiMax=(fineGrid) ? 1:DYTools::npTBins[i];
       for (int yi=0; yi<yiMax; ++yi) {
 	nZpeak += nEvents(i,yi);
 	w2Zpeak += w2Events(i,yi);
@@ -481,16 +481,16 @@ void getXsecExtended(const TString mc_input, int debugMode=0, bool useFEWZ=true,
 
 
   // Containers of the normalized event counts
-  TMatrixD nEventsNorm (locMassBinCount,DYTools::nYBinsMax);    // number of weigthed events, normalized to Z-peak
-  TMatrixD nEventsDETNorm (locMassBinCount,DYTools::nYBinsMax); // number of weighted events in the detector acceptance, normalized to Z-peak
-  TMatrixD nEventsDETrecoPostIdxNorm (locMassBinCount,DYTools::nYBinsMax); // number of weighted events in the detector acceptance, normalized to Z-peak
-  TMatrixD nEventsNormErr (locMassBinCount,DYTools::nYBinsMax);
-  TMatrixD nEventsDETNormErr (locMassBinCount,DYTools::nYBinsMax);
-  TMatrixD nEventsDETrecoPostIdxNormErr (locMassBinCount,DYTools::nYBinsMax);
+  TMatrixD nEventsNorm (locMassBinCount,DYTools::npTBinsMax);    // number of weigthed events, normalized to Z-peak
+  TMatrixD nEventsDETNorm (locMassBinCount,DYTools::npTBinsMax); // number of weighted events in the detector acceptance, normalized to Z-peak
+  TMatrixD nEventsDETrecoPostIdxNorm (locMassBinCount,DYTools::npTBinsMax); // number of weighted events in the detector acceptance, normalized to Z-peak
+  TMatrixD nEventsNormErr (locMassBinCount,DYTools::npTBinsMax);
+  TMatrixD nEventsDETNormErr (locMassBinCount,DYTools::npTBinsMax);
+  TMatrixD nEventsDETrecoPostIdxNormErr (locMassBinCount,DYTools::npTBinsMax);
 
-  TMatrixD nEventsErr (locMassBinCount,DYTools::nYBinsMax);
-  TMatrixD nEventsDETErr (locMassBinCount,DYTools::nYBinsMax);
-  TMatrixD nEventsDETrecoPostIdxErr (locMassBinCount,DYTools::nYBinsMax);
+  TMatrixD nEventsErr (locMassBinCount,DYTools::npTBinsMax);
+  TMatrixD nEventsDETErr (locMassBinCount,DYTools::npTBinsMax);
+  TMatrixD nEventsDETrecoPostIdxErr (locMassBinCount,DYTools::npTBinsMax);
 
   nEventsNorm=0;
   nEventsDETNorm=0;
@@ -504,7 +504,7 @@ void getXsecExtended(const TString mc_input, int debugMode=0, bool useFEWZ=true,
 
   if (debugMode!=-1) {
   for(int i=0; i<locMassBinCount; i++) {
-    int yiMax=(fineGrid) ? 1:DYTools::nYBins[i];
+    int yiMax=(fineGrid) ? 1:DYTools::npTBins[i];
     for (int j=0; j<yiMax; j++) {
       nEventsErr(i,j)=sqrt(w2Events(i,j));
       nEventsDETErr(i,j)=sqrt(w2EventsDET(i,j));
@@ -604,7 +604,6 @@ void getXsecExtended(const TString mc_input, int debugMode=0, bool useFEWZ=true,
   // string buffers
   //char ylabel[50];   // y-axis label
 
-
   if (DYTools::study2D) {
     TString c2Dname="canvXsectTh_2D";
     if (useFewzWeights) c2Dname.Append("_FEWZ");
@@ -621,9 +620,15 @@ void getXsecExtended(const TString mc_input, int debugMode=0, bool useFEWZ=true,
       cpV.push_back(cp);
       hXsecV.push_back( plotXsec2D("xsec",iM,nEvents,nEventsErr,cp,kBlack,1) );
     }
-    c2D->Divide(2,3);
-    for (int ipad=1; ipad<=6; ++ipad) {
-      cpV[ipad]->Draw(c2D,false,"png",ipad);
+    // tmadlener, 18.08.17:
+    // divide the canvas into 2 columns and the necessary number of rows. to do this we play a little
+    // trick with integer division. If we have an odd number, bump it to the next even number before
+    // dividing by two, to have enough rows to plot all mass bins
+    const int padRows = ((DYTools::nMassBins % 2) ? DYTools::nMassBins + 1 : DYTools::nMassBins)  / 2;
+    c2D->Divide(2,padRows);
+
+    for (int ipad=0; ipad<DYTools::nMassBins; ++ipad) {
+      cpV[ipad]->Draw(c2D,false,"png",ipad + 1);
     }
     c2D->Update();
     SaveCanvas(c2D,c2Dname);
