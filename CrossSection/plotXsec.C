@@ -25,8 +25,8 @@
 //
 
 const int landscape=1;  // page orientation for 2D plots
-const int plot_theoryCT10=1; // 2D theory prediction
-const int plot_theoryMSTW2008=1; // 2D theory prediction
+const int plot_theoryCT10=0; // 2D theory prediction
+const int plot_theoryMSTW2008=0; // 2D theory prediction
 
 const int showPoints=0; // whether to show 1D theory prediction in 40 bins
 
@@ -134,7 +134,7 @@ void plotXsec(const TString xsecConfFile, const TString xSecKindString,
     // 
 
     // data
-    for (int i=0; i<6; ++i) {
+    for (int i=0; i<DYTools::nMassBins -1 ; ++i) { // -1 because we skipped the 1st bin and we don't want to get out of bounds
       const int iM=i+1; // skip 1st mass bin
       ComparisonPlot_t *cp=new ComparisonPlot_t(compPlot,Form("compPlot_%d",i+1),"");
       compPlotsV.push_back(cp);
@@ -161,6 +161,7 @@ void plotXsec(const TString xsecConfFile, const TString xSecKindString,
 
       // data
       TH1F* hData=readData(triggers,csKind,iM,dataFName);
+      cout << hData << endl;
       histos.push_back(hData);
       localHV.push_back(hData);
       cp->AddHist1D(hData,"data","P",kBlack,1,0,1);

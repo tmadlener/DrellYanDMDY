@@ -150,14 +150,13 @@ void SaveCanvas(TCanvas* canv, const TString &canvName, TString destDir=CPlot::s
   gSystem->mkdir(destDir+TString("/png"),kTRUE);
   gSystem->mkdir(destDir+TString("/pdf"),kTRUE);
   gSystem->mkdir(destDir+TString("/root"),kTRUE);
-
   TString saveName=destDir+TString("/png/");
   saveName+=canvName;
   saveName+=".png";
-  canv->SaveAs(saveName);
+  //canv->SaveAs(saveName); // No png plots because of root bug or something
   saveName.ReplaceAll("png","pdf");
   canv->SaveAs(saveName);
-  saveName.ReplaceAll("pdf","root");
+  saveName.ReplaceAll("pdf","root"); // pdf plots works (why??)
   canv->SaveAs(saveName);
   return;
 }

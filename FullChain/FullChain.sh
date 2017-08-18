@@ -65,13 +65,13 @@ do_escaleSystematics=0  # Can be skipped, very long calculation! but see dummy s
 do_acceptance=0         # Necessary for simplest x-sec
 do_acceptanceSyst=0     # Can be skipped, see below about dummy systematics
 do_efficiency=0         # Necessary for simplest x-sec
-do_efficiencyScaleFactors=1 # Necessary for simplest x-sec, LONG, check EventScaleFactors/*sh script settings!
+do_efficiencyScaleFactors=0 # Necessary for simplest x-sec, LONG, check EventScaleFactors/*sh script settings! ; There is also files in root_files/constants
 do_plotFSRCorrections=0 # Necessary for simplest x-secpt
 
 do_plotFSRCorrectionsSansAcc=0 # Necessary for simplest x-sec
 do_setupTheory=0        # Necessary for simplest x-sec
 do_crossSectionFsr=0    # Necessary for simplest x-sec
-do_plotXSec=0           # Necessary for simplest x-sec
+do_plotXSec=1           # Necessary for simplest x-sec
 
 
 # Dummy systematics. When one wishes to not spend time O(day) to compute
@@ -132,7 +132,7 @@ if [ ${#tmp} -eq ${#anTag} ] ; then
   expectXSecPlotFile="../CrossSection/plots_1D_${crossSectionTag}/png/cXsec_preFsrNorm_1D.png"
 else
   expectXSecFile="../root_files/${crossSectionTag}${fsrUnfSet}/xSecDET_results_2D.root"
-  expectXSecPlotFile="../CrossSection/plots_2D_${crossSectionTag}/png/cXsec_preFsrDetNorm_2D.png"
+  expectXSecPlotFile="../CrossSection/plots_2D_${crossSectionTag}/pdf/cXsec_preFsrDetNorm_2D.pdf" # We changes this tp pdf because there is a root problem with the png
 fi
 
 

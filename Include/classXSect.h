@@ -200,34 +200,34 @@ TH1F* readTh(TVectorD &v, TVectorD &vErr, const TriggerSelection &triggers, DYTo
     std::cout << "readTh: for 1D case v[DYTools::nMassBins]=" << DYTools::nMassBins << " is expected\n";
     ok=false;
   }
-  else if ((DYTools::study2D==1) && (v.GetNoElements()!=DYTools::nYBins[iMassBin])) {
-    std::cout << "readTh: for 2D case v[DYTools::nYBins[iMassBin=" << iMassBin << "]=" << DYTools::nYBins[iMassBin] << " is expected, not " << v.GetNoElements() << "\n";
+  else if ((DYTools::study2D==1) && (v.GetNoElements()!=DYTools::npTBins[iMassBin])) {
+    std::cout << "readTh: for 2D case v[DYTools::npTBins[iMassBin=" << iMassBin << "]=" << DYTools::npTBins[iMassBin] << " is expected, not " << v.GetNoElements() << "\n";
     ok=false;
   }
 
   TString name=Form("xsecTh_%s_%s",DYTools::analysisTag.Data(),CrossSectionKindName(theKind).Data());
   if (ok && (DYTools::study2D==0)) {
     const int perMassBinWidth=1;
-    const int perRapidityBinWidth=0;
+    const int perRapiditpTBinWidth=0;
     if (fineGrid) {
       TVectorD *massBinEdges= (TVectorD*)fileXsecTh.FindObjectAny("massBinEdges");
-      TVectorD *rapidityBinCounts= (TVectorD*)fileXsecTh.FindObjectAny("rapidityBinCount");
-      if (!massBinEdges || !rapidityBinCounts) {
+      TVectorD *rapiditpTBinCounts= (TVectorD*)fileXsecTh.FindObjectAny("rapiditpTBinCount");
+      if (!massBinEdges || !rapiditpTBinCounts) {
 	std::cout << "readTh: for extraFlag it is expected that the file <" 
 		  << xSecThResultFileName << "> will contain vectors " 
-		  << "'massBinEdges' and 'rapidityBinCount'\n";
+		  << "'massBinEdges' and 'rapiditpTBinCount'\n";
 	assert(0);
       }
       histo= extractMassDependenceSpec(name,name, *xSecTh,*xSecThErr, 0,
-				       *massBinEdges, *rapidityBinCounts,
-				       perMassBinWidth,perRapidityBinWidth);
+				       *massBinEdges, *rapiditpTBinCounts,
+				       perMassBinWidth,perRapiditpTBinWidth);
       delete massBinEdges;
-      delete rapidityBinCounts;
+      delete rapiditpTBinCounts;
       v=0; vErr=0;
     }
     else {
       histo= extractMassDependence(name,name, *xSecTh, *xSecThErr, 0, 
-				   perMassBinWidth,perRapidityBinWidth);
+				   perMassBinWidth,perRapiditpTBinWidth);
       for(int i=0; i<DYTools::nMassBins; i++){
 	v[i] = (*xSecTh)[i][0];
 	vErr[i] = (*xSecThErr)[i][0];
@@ -237,7 +237,7 @@ TH1F* readTh(TVectorD &v, TVectorD &vErr, const TriggerSelection &triggers, DYTo
   else if (ok && (DYTools::study2D==1)) {
     histo= extractRapidityDependence(name,name, *xSecTh, *xSecThErr, iMassBin, 0);
     //printHisto(std::cout,histo);
-    for(int iY=0; iY<DYTools::nYBins[iMassBin]; iY++){
+    for(int iY=0; iY<DYTools::npTBins[iMassBin]; iY++){
       v[iY] = (*xSecTh)[iMassBin][iY];
       vErr[iY] = (*xSecThErr)[iMassBin][iY];
     }
@@ -309,17 +309,17 @@ TH1F* readTheory2D(TVectorD &v, TVectorD &vErr, DYTools::TCrossSectionKind_t the
     std::cout << "readTh: for 1D case v[DYTools::nMassBins] is expected\n";
     ok=false;
   }
-  else if ((DYTools::study2D==1) && (v.GetNoElements()!=DYTools::nYBins[iMassBin])) {
-    std::cout << "readTh: for 2D case v[DYTools::nYBins[iMassBin=" << iMassBin << "] is expected\n";
+  else if ((DYTools::study2D==1) && (v.GetNoElements()!=DYTools::npTBins[iMassBin])) {
+    std::cout << "readTh: for 2D case v[DYTools::npTBins[iMassBin=" << iMassBin << "] is expected\n";
     ok=false;
   }
 
   TString name=Form("%s_%s_%s",histName,DYTools::analysisTag.Data(),CrossSectionKindName(theKind).Data());
   if (ok && (DYTools::study2D==0)) {
     const int perMassBinWidth=1;
-    const int perRapidityBinWidth=0;
+    const int perRapiditpTBinWidth=0;
     histo= extractMassDependence(name,name, *xSecTh, *xSecThErr, 0, 
-				 perMassBinWidth,perRapidityBinWidth);
+				 perMassBinWidth,perRapiditpTBinWidth);
     for(int i=0; i<DYTools::nMassBins; i++){
       v[i] = (*xSecTh)[i][0];
       vErr[i] = (*xSecThErr)[i][0];
@@ -328,7 +328,7 @@ TH1F* readTheory2D(TVectorD &v, TVectorD &vErr, DYTools::TCrossSectionKind_t the
   else if (ok && (DYTools::study2D==1)) {
     histo= extractRapidityDependence(name,name, *xSecTh, *xSecThErr, iMassBin, 0);
     //printHisto(std::cout,histo);
-    for(int iY=0; iY<DYTools::nYBins[iMassBin]; iY++){
+    for(int iY=0; iY<DYTools::npTBins[iMassBin]; iY++){
       v[iY] = (*xSecTh)[iMassBin][iY];
       vErr[iY] = (*xSecThErr)[iMassBin][iY];
     }
@@ -372,8 +372,8 @@ TH1F* readData(TVectorD &v, TVectorD &vErr1, TVectorD &vErr2, const TriggerSelec
   case DYTools::_cs_postFsrNorm:
     xSecName="normXSec"; xSecErrName="normXSecErr"; xSecSystErrName="normXSecErrSyst";
     if (extraFlag==extraFlagData_oldStyle) {
-      xSecName="normXSecByBin"; xSecErrName="normXSecErrByBin";
-      xSecSystErrName="normXSecErrByBinSyst";
+      xSecName="normXSecBpTBin"; xSecErrName="normXSecErrBpTBin";
+      xSecSystErrName="normXSecErrBpTBinSyst";
     }
     break;
   case DYTools::_cs_preFsrDet:
@@ -395,7 +395,7 @@ TH1F* readData(TVectorD &v, TVectorD &vErr1, TVectorD &vErr2, const TriggerSelec
 
   // Check that the binning is consistent
   bool checkResult = true;
-  if ((iMassBin>=0) && ( v.GetNoElements() != DYTools::nYBins[iMassBin] )) {
+  if ((iMassBin>=0) && ( v.GetNoElements() != DYTools::npTBins[iMassBin] )) {
     checkResult = false;
   }
   if( !checkResult ){
@@ -412,9 +412,9 @@ TH1F* readData(TVectorD &v, TVectorD &vErr1, TVectorD &vErr2, const TriggerSelec
   if (ok && (DYTools::study2D==0)) {
     int perMassBinWidth=(extraFlag == extraFlagData_oldStyle) ? 0:1;
     if (DYTools::study2D) perMassBinWidth=0;
-    int perRapidityBinWidth=0;
+    int perRapiditpTBinWidth=0;
     std::cout << "calling extracMassDependence with perMassBinWidth=" << perMassBinWidth << "\n";
-    histo= extractMassDependence(name,name, xSecM, xSecErr1M, 0, perMassBinWidth,perRapidityBinWidth);
+    histo= extractMassDependence(name,name, xSecM, xSecErr1M, 0, perMassBinWidth,perRapiditpTBinWidth);
     for(int i=0; i<DYTools::nMassBins; i++){
       v[i] = xSecM[i][0];
       vErr1[i] = xSecErr1M[i][0];
@@ -424,7 +424,7 @@ TH1F* readData(TVectorD &v, TVectorD &vErr1, TVectorD &vErr2, const TriggerSelec
   else if (ok && (DYTools::study2D==1)) {
     int perMassBinWidth=0;
     histo= extractRapidityDependence(name,name, xSecM, xSecErr1M, iMassBin, perMassBinWidth);
-    for(int iY=0; iY<DYTools::nYBins[iMassBin]; iY++){
+    for(int iY=0; iY<DYTools::npTBins[iMassBin]; iY++){
       v[iY] = xSecM[iMassBin][iY];
       vErr1[iY] = xSecErr1M[iMassBin][iY];
       vErr2[iY] = xSecErr2M[iMassBin][iY];
@@ -518,7 +518,7 @@ TH1F* readTh1D_MSTW2008(DYTools::TCrossSectionKind_t theKind, const char *histNa
 
 inline
 TH1F* readTh(const TriggerSelection &triggers, DYTools::TCrossSectionKind_t theKind, int iMassBin, int useFEWZ, int extraFlag) {
-  int nBins=(DYTools::study2D) ? DYTools::nYBins[iMassBin] : DYTools::nMassBins;
+  int nBins=(DYTools::study2D) ? DYTools::npTBins[iMassBin] : DYTools::nMassBins;
   TVectorD v(nBins);
   TVectorD vErr(nBins);
   return readTh(v,vErr,triggers,theKind,iMassBin,useFEWZ,extraFlag);
@@ -528,7 +528,7 @@ TH1F* readTh(const TriggerSelection &triggers, DYTools::TCrossSectionKind_t theK
 
 inline
 TH1F* readTh2D_CT10(DYTools::TCrossSectionKind_t theKind, int iMassBin) {
-  int nBins=(DYTools::study2D) ? DYTools::nYBins[iMassBin] : DYTools::nMassBins;
+  int nBins=(DYTools::study2D) ? DYTools::npTBins[iMassBin] : DYTools::nMassBins;
   TVectorD v(nBins);
   TVectorD vErr(nBins);
   return readTheory2D(v,vErr,theKind,iMassBin,"../root_files/theory/xSectTheory_CTEQ10W.root","hCT10");
@@ -538,7 +538,7 @@ TH1F* readTh2D_CT10(DYTools::TCrossSectionKind_t theKind, int iMassBin) {
 
 inline
 TH1F* readTh2D_MSTW2008(DYTools::TCrossSectionKind_t theKind, int iMassBin) {
-  int nBins=(DYTools::study2D) ? DYTools::nYBins[iMassBin] : DYTools::nMassBins;
+  int nBins=(DYTools::study2D) ? DYTools::npTBins[iMassBin] : DYTools::nMassBins;
   TVectorD v(nBins);
   TVectorD vErr(nBins);
   return readTheory2D(v,vErr,theKind,iMassBin,"../root_files/theory/xSectTheory2D_MSTW2008.root","hMSTW2008");
@@ -548,7 +548,7 @@ TH1F* readTh2D_MSTW2008(DYTools::TCrossSectionKind_t theKind, int iMassBin) {
 
 inline
 TH1F* readTh2D_HERAPDF15(DYTools::TCrossSectionKind_t theKind, int iMassBin) {
-  int nBins=(DYTools::study2D) ? DYTools::nYBins[iMassBin] : DYTools::nMassBins;
+  int nBins=(DYTools::study2D) ? DYTools::npTBins[iMassBin] : DYTools::nMassBins;
   TVectorD v(nBins);
   TVectorD vErr(nBins);
   return readTheory2D(v,vErr,theKind,iMassBin,"../root_files/theory/xSectTheory2D_HERAPDF15.root","hHERAPDF15");
@@ -558,7 +558,7 @@ TH1F* readTh2D_HERAPDF15(DYTools::TCrossSectionKind_t theKind, int iMassBin) {
 
 inline
 TH1F* readTh2D_ABKM09(DYTools::TCrossSectionKind_t theKind, int iMassBin) {
-  int nBins=(DYTools::study2D) ? DYTools::nYBins[iMassBin] : DYTools::nMassBins;
+  int nBins=(DYTools::study2D) ? DYTools::npTBins[iMassBin] : DYTools::nMassBins;
   TVectorD v(nBins);
   TVectorD vErr(nBins);
   return readTheory2D(v,vErr,theKind,iMassBin,"../root_files/theory/xSectTheory2D_ABKM09.root","hABKM09");
@@ -569,7 +569,7 @@ TH1F* readTh2D_ABKM09(DYTools::TCrossSectionKind_t theKind, int iMassBin) {
 inline
 TH1F* readData(const TriggerSelection &triggers, DYTools::TCrossSectionKind_t theKind, int iMassBin, TString fname, int extraFlag=0){
   std::cout << "readData <" << fname << ">" << std::endl;
-  int nBins=(DYTools::study2D) ? DYTools::nYBins[iMassBin] : DYTools::nMassBins;
+  int nBins=(DYTools::study2D) ? DYTools::npTBins[iMassBin] : DYTools::nMassBins;
   TVectorD v(nBins);
   TVectorD vErr1(nBins);
   TVectorD vErr2(nBins);
@@ -633,11 +633,11 @@ TH1F* readYields(const TYieldsKind_t kind, int iMassBin, TString fname, int hasE
     TVectorD *yieldTmp= (TVectorD*)file.FindObjectAny(name);
     TVectorD *yieldTmpErr= (!hasError && (nameErr.Length()==0)) ? NULL : (TVectorD*)file.FindObjectAny(nameErr);
     if (yieldTmp) {
-      yieldsPtr=new TMatrixD(DYTools::nMassBins,DYTools::nYBinsMax);
+      yieldsPtr=new TMatrixD(DYTools::nMassBins,DYTools::npTBinsMax);
       unfolding::deflattenMatrix(*yieldTmp,*yieldsPtr);
     }
     if (yieldTmpErr) {
-      yieldsErrPtr=new TMatrixD(DYTools::nMassBins,DYTools::nYBinsMax);
+      yieldsErrPtr=new TMatrixD(DYTools::nMassBins,DYTools::npTBinsMax);
       unfolding::deflattenMatrix(*yieldTmpErr,*yieldsErrPtr);
     }
   }
@@ -664,12 +664,12 @@ TH1F* readYields(const TYieldsKind_t kind, int iMassBin, TString fname, int hasE
   histoName.ReplaceAll("/","_");
   if (ok && (DYTools::study2D==0)) {
     int perMassBinWidth=0;
-    int perRapidityBinWidth=0;
-    histo= extractMassDependence(histoName,histoName, yields, yieldsErr, 0, perMassBinWidth,perRapidityBinWidth);
+    int perRapiditpTBinWidth=0;
+    histo= extractMassDependence(histoName,histoName, yields, yieldsErr, 0, perMassBinWidth,perRapiditpTBinWidth);
   }
   else if (ok && (DYTools::study2D==1)) {
     int perMassBinWidth=0;
-    //int perRapidityBinWidth=0;
+    //int perRapiditpTBinWidth=0;
     histo= extractRapidityDependence(histoName,histoName, yields, yieldsErr, iMassBin, perMassBinWidth);
   }
 
