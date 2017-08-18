@@ -16,6 +16,12 @@
 
 //#define _check_Zpeak
 
+// tmadlener, TODO list (Aug 17)
+// - make binning names 'variabl' agnostic
+// - put functions defined below everywhere where they belong
+// - test if everything is still running
+
+
 namespace DYTools {
 
   // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
@@ -73,6 +79,34 @@ namespace DYTools {
 	     ((et1>etMinLead) || (et2>etMinLead)) ) ? true : false;
   }
 
+  /**
+   * Function to get the variable of interest for the analysis.
+   * In principle it should suffice to change the value returned here
+   * to retrieve this variable everywhere where data or mc is used.
+   *
+   * Templated to have only one definition. Function call should be optimized/inlined
+   * at compilation.
+   */
+  template<typename DataType>
+  inline double getVal(const DataType *data)
+  {
+    return data->pt;
+  }
+
+  /**
+   * Function to get the generation level (= pre fsr) value of the variable of interest.
+   * In principle it should suffice to change the value returned here to retrieve this
+   * variable everywhere where this information is needed.
+   *
+   * Templated in order to not have to include/forward declare every possible type
+   * that could use this. Function call should be optimized/inlined at compilation.
+   */
+  template<typename GenDataInfo>
+  inline double getGenVal(const GenDataInfo *gendata)
+  {
+    return gendata->vpt;
+  }
+
 
   // Constants that define binning in mass and rapidity
   // Note: bin zero is underflow, overflow is neglected
@@ -81,6 +115,13 @@ namespace DYTools {
     {10, // first bin is underflow
      30, 40, 50, 60, 120, 1500
     }; // overflow is very unlikely, do not account for it
+
+  // Binning for analysis variable can be different for different mass bins
+  // The binning that is actually chosen for the analysis variable is defined
+  // below in lines around following line 270 (approx.).
+  // Currently this is done for the pT binning. If different bins are needed
+  // make sure to have the appropriate definitions in place there.
+  
   // Rapidity binning is different for different mass bins
   // Note: this implementation neglects underflow and overflow
   // in rapidity.
@@ -231,16 +272,18 @@ namespace DYTools {
   const DYTools::TMassBinning_t massBinningSet=(study2D) ? _MassBins_2011_2D : _MassBins_2012;
   const int nMassBins=(study2D) ? _nMassBins2D : _nMassBins2012;
   const double *massBinLimits=(study2D) ? _massBinLimits2D : _massBinLimits2012;
-  const int *npTBins=(study2D) ? _npTBins2D : _npTBins2012;
-  const int npTBinsMax=(study2D) ? _npTBinsMax2D : _npTBinsMax2012;
+  const int *nXXBins=(study2D) ? _npTBins2D : _npTBins2012;
+  const int nXXBinsMax=(study2D) ? _npTBinsMax2D : _npTBinsMax2012;
 #else
   const DYTools::TMassBinning_t massBinningSet=(study2D) ? _MassBins_2011_2D : _MassBins_Zpeak;
   const int nMassBins=(study2D) ? _nMassBins2D : _nMassBinsZpeak;
   const double *massBinLimits=(study2D) ? _massBinLimits2D : _massBinLimitsZpeak;
-  const int *npTBins=(study2D) ? _npTBins2D : _npTBinsZpeak;
-  const int npTBinsMax=(study2D) ? _npTBinsMax2D : _npTBinsMaxZpeak;
+  const int *nXXBins=(study2D) ? _npTBins2D : _npTBinsZpeak;
+  const int nXXBinsMax=(study2D) ? _npTBinsMax2D : _npTBinsMaxZpeak;
 #endif
 
+  const double XXRangeMin = pTRangeMin;
+  const double XXRangeMax = pTRangeMax;
   /*
   const DYTools::TMassBinning_t massBinningSet= _MassBins_test4;
   const int nMassBins= _nMassBinsTest4;
@@ -253,7 +296,7 @@ namespace DYTools {
 
   const TString study2Dstr=(study2D) ? "2D" : "1D";
   const TString analysisTag=study2Dstr + analysisTag_USER;
-  const int nUnfoldingBinsMax= nMassBins * npTBinsMax;
+  const int nUnfoldingBinsMax= nMassBins * nXXBinsMax;
 
   // some analyses use 1D always
   //const int nMassBins1D=nMassBins2011;
@@ -277,37 +320,37 @@ namespace DYTools {
   }
 
   inline 
-  int findpTBin(int massBin, double pT){
+  int findXXBin(int massBin, double XX){
   
     int result = -1;
     if( massBin < 0 || massBin > nMassBins) return result;
-    if ( pT < pTRangeMin  ||  pT > pTRangeMax ) return result;
+    if ( XX < XXRangeMin  ||  XX > XXRangeMax ) return result;
 
-    int npTBinsThisMassRange = npTBins[massBin];
+    int nXXBinsThisMassRange = nXXBins[massBin];
 
     int newCode=1;
     if (newCode) {
-      result = int( ( pT - pTRangeMin )* 1.000001*npTBinsThisMassRange/( pTRangeMax - pTRangeMin ) );
-      double dpT=((pTRangeMax-pTRangeMin)/double(npTBinsThisMassRange));
-      //std::cout << "pT=" << pT << ", dpT=" << dpT  << ", binIdx=" << result << ", pTRange=" << (result*dpT) << ".." << (result*dpT+dpT) << "\n";
-      if (result < 0 || result >= npTBinsThisMassRange) {
-	std::cout << "pT=" << pT << ", dpT=" << dpT  << ", binIdx=" << result << ", pTRange=" << (result*dpT+pTRangeMin) << ".." << (result*dpT+dpT+pTRangeMin) << "\n";
+      result = int( ( XX - XXRangeMin )* 1.000001*nXXBinsThisMassRange/( XXRangeMax - XXRangeMin ) );
+      double dXX=((XXRangeMax-XXRangeMin)/double(nXXBinsThisMassRange));
+      //std::cout << "XX=" << XX << ", dXX=" << dXX  << ", binIdx=" << result << ", XXRange=" << (result*dXX) << ".." << (result*dXX+dXX) << "\n";
+      if (result < 0 || result >= nXXBinsThisMassRange) {
+	std::cout << "XX=" << XX << ", dXX=" << dXX  << ", binIdx=" << result << ", XXRange=" << (result*dXX+XXRangeMin) << ".." << (result*dXX+dXX+XXRangeMin) << "\n";
 	result=-1;
       }
     }
     else {
       // Make the array large enough to accommodate any Y binning
-      double pTBinLimits[5000];
-      double width = (pTRangeMax - pTRangeMin)/double(npTBinsThisMassRange);
-      for(int i=0; i<npTBinsThisMassRange; i++){
-	pTBinLimits[i] = pTRangeMin + i * width;
+      double XXBinLimits[5000];
+      double width = (XXRangeMax - XXRangeMin)/double(nXXBinsThisMassRange);
+      for(int i=0; i<nXXBinsThisMassRange; i++){
+	XXBinLimits[i] = XXRangeMin + i * width;
       }
       // The line below could have been done in the loop above,
       // but it is here done separately to avoid rounding uncertainty.
-      pTBinLimits[npTBinsThisMassRange] = pTRangeMax;
+      XXBinLimits[nXXBinsThisMassRange] = XXRangeMax;
       
-      for(int i=0; i < npTBinsThisMassRange; i++){
-	if( pT >= pTBinLimits[i] && pT < pTBinLimits[i+1]) {
+      for(int i=0; i < nXXBinsThisMassRange; i++){
+	if( XX >= XXBinLimits[i] && XX < XXBinLimits[i+1]) {
 	  result = i;
 	  break;
 	}
@@ -317,59 +360,59 @@ namespace DYTools {
     return result;
   }
   
-  inline int findAbspTBin(int massBin, double pT){ return findpTBin(massBin,fabs(pT)); }
-  inline int findpTBin(double mass, double pT) { return findpTBin(findMassBin(mass),pT); }
-  inline int findAbspTBin(double mass, double pT) { return findpTBin(findMassBin(mass),fabs(pT)); }
+  inline int findAbsXXBin(int massBin, double pT){ return findXXBin(massBin,fabs(pT)); }
+  inline int findXXBin(double mass, double pT) { return findXXBin(findMassBin(mass),pT); }
+  inline int findAbsXXBin(double mass, double pT) { return findXXBin(findMassBin(mass),fabs(pT)); }
 
   // return rapidity value at the Ybin center
   inline 
-  double findAbspTValue(int massBin, int pTBin) {
+  double findAbsXXValue(int massBin, int XXBin) {
     if (massBin>=nMassBins) {
-      std::cout << "ERROR in findAbspTValue: massBin=" << massBin << ", nMassBins=" << nMassBins << "\n";
+      std::cout << "ERROR in findAbsXXValue: massBin=" << massBin << ", nMassBins=" << nMassBins << "\n";
       return 0;
     }
-    int pTbinCount=npTBins[massBin];
-    if (pTBin>pTbinCount) {
-      std::cout << "ERROR in findAbspTValue: massBin=" << massBin << ", pTBin=" << pTBin << ", npTBins[massBin]=" << pTbinCount << "\n";
+    int XXbinCount=nXXBins[massBin];
+    if (XXBin>XXbinCount) {
+      std::cout << "ERROR in findAbsXXValue: massBin=" << massBin << ", XXBin=" << XXBin << ", nXXBins[massBin]=" << XXbinCount << "\n";
       return 0;
     }
-    double pTh=(pTRangeMax-pTRangeMin)/double(pTbinCount);
-    return (pTBin+0.5)*pTh;
+    double XXh=(XXRangeMax-XXRangeMin)/double(XXbinCount);
+    return (XXBin+0.5)*XXh;
   }
   
   // return rapidity range of pTbin
   inline 
-  void findAbspTValueRange(int massBin, int pTBin, double &abspTMin, double &abspTMax) {
-    abspTMin=0.; abspTMax=0.;
+  void findAbsXXValueRange(int massBin, int XXBin, double &absXXMin, double &absXXMax) {
+    absXXMin=0.; absXXMax=0.;
     if (massBin>=nMassBins) {
-      std::cout << "ERROR in findAbspTValueRange: massBin=" << massBin << ", nMassBins=" << nMassBins << "\n";
+      std::cout << "ERROR in findAbsXXValueRange: massBin=" << massBin << ", nMassBins=" << nMassBins << "\n";
       return;
     }
-    int pTbinCount=npTBins[massBin];
-    if (pTBin>pTbinCount) {
-      std::cout << "ERROR in findAbspTValueRange: massBin=" << massBin << ", pTBin=" << pTBin << ", npTBins[massBin]=" << pTbinCount << "\n";
+    int XXbinCount=nXXBins[massBin];
+    if (XXBin>XXbinCount) {
+      std::cout << "ERROR in findAbsXXValueRange: massBin=" << massBin << ", XXBin=" << XXBin << ", nXXBins[massBin]=" << XXbinCount << "\n";
       return;
     }
-    double pTh=(pTRangeMax-pTRangeMin)/double(pTbinCount);
-    abspTMin=pTBin*pTh;
-    abspTMax=pTBin*pTh+pTh;
+    double XXh=(XXRangeMax-XXRangeMin)/double(XXbinCount);
+    absXXMin=XXBin*XXh;
+    absXXMax=XXBin*XXh+XXh;
     return;
   }
   
 
   // This function finds a unique 1D index for (index_m, index_y) pair
   inline 
-  int findIndexFlat(int massBin, int pTBin){
+  int findIndexFlat(int massBin, int XXBin){
     
     int result = -1;
-    if( massBin < 0 || massBin >= nMassBins || pTBin < 0 || pTBin >= npTBins[massBin] )
+    if( massBin < 0 || massBin >= nMassBins || XXBin < 0 || XXBin >= nXXBins[massBin] )
       return result;
     
     result = 0;
     for(int i=0; i< massBin; i++)
-      result += npTBins[i];
+      result += nXXBins[i];
     
-    result += pTBin;
+    result += XXBin;
     
     return result;
   }
@@ -378,7 +421,7 @@ namespace DYTools {
   inline 
   int findIndexFlat(double mass, double pT){
     int massBin=findMassBin(mass);
-    int pTBin=findAbspTBin(massBin,pT);
+    int pTBin=findAbsXXBin(massBin,pT);
     return findIndexFlat(massBin,pTBin);
   }
 
@@ -390,17 +433,17 @@ namespace DYTools {
   int getTotalNumberOfBins(){
     int result = 0;
     for(int i=0; i<nMassBins; i++)
-      result += npTBins[i];
+      result += nXXBins[i];
     return result;
   }
 
   // Largest number of Ybins
   inline 
-  int findMaxpTBins(){
-    int npTBMax=npTBins[0];
+  int findMaxXXBins(){
+    int nXXBMax=nXXBins[0];
     for (int i=1; i<nMassBins; i++)
-      if (npTBins[i]>npTBMax) npTBMax=npTBins[i];
-    return npTBMax;
+      if (nXXBins[i]>nXXBMax) nXXBMax=nXXBins[i];
+    return nXXBMax;
   }
 
   // Bin limits in rapidity for a particular mass slice
@@ -410,13 +453,13 @@ namespace DYTools {
     if( massBin < 0 || massBin >= nMassBins ) {
       return result;
     }
-    int npTBinsThisSlice = npTBins[massBin];
-    result = new double[npTBinsThisSlice+1];
-    double delta = (pTRangeMax - pTRangeMin)/double(npTBinsThisSlice);
-    for(int i=0; i<npTBinsThisSlice; i++){
-      result[i] = pTRangeMin + i * delta;
+    int nXXBinsThisSlice = nXXBins[massBin];
+    result = new double[nXXBinsThisSlice+1];
+    double delta = (XXRangeMax - XXRangeMin)/double(nXXBinsThisSlice);
+    for(int i=0; i<nXXBinsThisSlice; i++){
+      result[i] = XXRangeMin + i * delta;
     }
-    result[npTBinsThisSlice] = pTRangeMax;
+    result[nXXBinsThisSlice] = XXRangeMax;
     return result;
   }
 

@@ -200,7 +200,7 @@ void prepareYields(const TString conf  = "data_plot.conf",
 
   vector<TMatrixD*> yields;
   vector<TMatrixD*> yieldsSumw2;
-  int maxpTBins = DYTools::findMaxpTBins();
+  int maxXXBins = DYTools::findMaxXXBins();
   vector<TString> sampleTags;
 
   vector<TH1F*>    hMassv;
@@ -212,11 +212,11 @@ void prepareYields(const TString conf  = "data_plot.conf",
 
   char hname[100];
   for(UInt_t isam=0; isam<samplev.size(); isam++) {
-    TMatrixD *yieldsMatrix = new TMatrixD(DYTools::nMassBins, maxpTBins);
+    TMatrixD *yieldsMatrix = new TMatrixD(DYTools::nMassBins, maxXXBins);
     (*yieldsMatrix) = 0;
     yields.push_back(yieldsMatrix);
     //
-    TMatrixD *yieldsSumw2Matrix = new TMatrixD(DYTools::nMassBins, maxpTBins);
+    TMatrixD *yieldsSumw2Matrix = new TMatrixD(DYTools::nMassBins, maxXXBins);
     (*yieldsSumw2Matrix) = 0;
     yieldsSumw2.push_back(yieldsSumw2Matrix);
     //
@@ -395,15 +395,15 @@ void prepareYields(const TString conf  = "data_plot.conf",
 
       // Find the 2D bin for this event:
       int massBin = DYTools::findMassBin(data->mass);
-      int pTBin    = DYTools::findAbspTBin(massBin, data->pt);
+      int XXBin    = DYTools::findAbsXXBin(massBin, DYTools::getVal(data));
 
-      if ((massBin==-1) || (pTBin==-1)){ // out of range
-	// cout << pTBin << " " << massBin << " " <<  data->pt << " " << data->mass << "\n";	
+      if ((massBin==-1) || (XXBin==-1)){ // out of range
+	// cout << XXBin << " " << massBin << " " <<  data->pt << " " << data->mass << "\n";	
 	continue;
       }
 
-      (*thisSampleYields)(massBin,pTBin) += weight;
-      (*thisSampleYieldsSumw2)(massBin,pTBin) += weight*weight;
+      (*thisSampleYields)(massBin,XXBin) += weight;
+      (*thisSampleYieldsSumw2)(massBin,XXBin) += weight*weight;
 
       hMassv[isam]->Fill(data->mass,weight);
       hMassBinsv[isam]->Fill(data->mass,weight);
@@ -510,7 +510,7 @@ void prepareYields(const TString conf  = "data_plot.conf",
   }
 
   //
-  // Draw mass spectrum without pT binning
+  // Draw mass spectrum without XX binning
   //
 
 
@@ -523,7 +523,7 @@ void prepareYields(const TString conf  = "data_plot.conf",
   // Draw the flattened figure (Y histograms for different mass regions)
   DrawFlattened(yields, yieldsSumw2, samplev, snamev, hasData, mergeDibosons, labelDibosons, colorDibosons, lumi, lumitext, fYieldPlots);
 
-  // Draw pT in mass slices 
+  // Draw XX in mass slices 
   if (DYTools::study2D==1)
     {
        Draw6Canvases(yields, yieldsSumw2, samplev, snamev, hasData, dataOverMc, dataOverMcEachBin, 1, 0, fYieldPlots);
@@ -542,10 +542,10 @@ void prepareYields(const TString conf  = "data_plot.conf",
 
   // Pack info into writable objects
   //TVectorD massBinLimits(nMassBins+1);
-  //TVectorD pTBinning(nMassBins+1);
+  //TVectorD XXBinning(nMassBins+1);
   //for(int i=0; i <= nMassBins; i++){
   //  massBinLimits(i) = DYTools::massBinLimits[i];
-  //  pTBinning(i) = DYTools::nYBins[i];
+  //  XXBinning(i) = DYTools::nXXBins[i];
   //}
 
   // This dummy object is only needed to convey the number
@@ -560,7 +560,7 @@ void prepareYields(const TString conf  = "data_plot.conf",
   fNameOutYields += ".root";
   TFile fYields( fNameOutYields, "recreate" );
   //massBinLimits      .Write("massBinLimits");
-  //pTBinning    .Write("pTBinning");
+  //XXBinning    .Write("XXBinning");
   unfolding::writeBinningArrays(fYields);
   dummySampleCount   .Write("dummySampleCount");
   unfolding::writeBinningArrays(fYields);
@@ -620,9 +620,9 @@ void prepareYields(const TString conf  = "data_plot.conf",
   cout << endl;
 
   //
-  // Summary printout in mass bins, integrated over pT
+  // Summary printout in mass bins, integrated over XX
   //
-  // Add yields over pT bins
+  // Add yields over XX bins
   double totalData            [DYTools::nMassBins];
   double totalSignalMC        [DYTools::nMassBins];
   double totalSignalMCError   [DYTools::nMassBins];
@@ -635,25 +635,25 @@ void prepareYields(const TString conf  = "data_plot.conf",
     totalSignalMCError[im] = 0;
     totalBg           [im] = 0;
     totalBgError      [im] = 0;
-    for(int ipT = 0; ipT < DYTools::npTBins[im]; ipT++){
+    for(int iXX = 0; iXX < DYTools::nXXBins[im]; iXX++){
       for( UInt_t isam = 0; isam < yields.size(); isam++){
 	if( sampleTags.at(isam) == TString("data") ){
-	  totalData[im] += (*yields.at(isam))(im,ipT);
+	  totalData[im] += (*yields.at(isam))(im,iXX);
 	}else if ( sampleTags.at(isam) == TString("zee") ){
-	  totalSignalMC[im] += (*yields.at(isam))(im,ipT);
-	  totalSignalMCError[im] += (*yieldsSumw2.at(isam))(im,ipT);
+	  totalSignalMC[im] += (*yields.at(isam))(im,iXX);
+	  totalSignalMCError[im] += (*yieldsSumw2.at(isam))(im,iXX);
 	}else{
 	  // what remains are background samples
-	  totalBg[im] += (*yields.at(isam))(im,ipT);
-	  totalBgError[im] += (*yieldsSumw2.at(isam))(im,ipT);
+	  totalBg[im] += (*yields.at(isam))(im,iXX);
+	  totalBgError[im] += (*yieldsSumw2.at(isam))(im,iXX);
 	}
       } // end loop over samples
-    } // end loop over pT bins
+    } // end loop over XX bins
     totalBgError[im] = sqrt( totalBgError[im] );
     totalSignalMCError[im] = sqrt( totalSignalMCError[im] );
   } // end loop over mass bins
 
-  printf("Printout of the data, MC signal and MC backgrounds integrated over pT\n");
+  printf("Printout of the data, MC signal and MC backgrounds integrated over XX\n");
   printf("     mass bin        data      MC-signal     MC-backgr\n");
   for(int im = 0; im < DYTools::nMassBins; im++){
     printf("%5.0f-%5.0f GeV: ", DYTools::massBinLimits[im],

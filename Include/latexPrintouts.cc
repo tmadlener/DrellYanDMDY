@@ -431,10 +431,10 @@ void latexPrintoutTwoColumns2D(const int nValues, int* valuesType, TMatrixD** va
        fprintf(txtFile,"%s",strQuantities.Data());
        fprintf(txtFile,"\\hline\n");
 
-       int halfBins=DYTools::npTBins[mslice]/2;
+       int halfBins=DYTools::nXXBins[mslice]/2;
        for (int j=0; j<halfBins; j++)
          {
-           fprintf(txtFile,"%1.1f-%1.1f", j*(DYTools::pTRangeMax-DYTools::pTRangeMin)/DYTools::npTBins[mslice], (j+1)*(DYTools::pTRangeMax-DYTools::pTRangeMin)/DYTools::npTBins[mslice]);
+           fprintf(txtFile,"%1.1f-%1.1f", j*(DYTools::XXRangeMax-DYTools::XXRangeMin)/DYTools::nXXBins[mslice], (j+1)*(DYTools::XXRangeMax-DYTools::XXRangeMin)/DYTools::nXXBins[mslice]);
            for (int i=0; i<nValues; i++)
              {
                 TMatrixD& temp0= *values[i];
@@ -450,9 +450,9 @@ void latexPrintoutTwoColumns2D(const int nValues, int* valuesType, TMatrixD** va
              }
 
            fprintf(txtFile,"&");
-           if (halfBins+j<DYTools::npTBins[mslice])
+           if (halfBins+j<DYTools::nXXBins[mslice])
              {
-               fprintf(txtFile,"%1.1f-%1.1f", (halfBins+j)*(DYTools::pTRangeMax-DYTools::pTRangeMin)/DYTools::npTBins[mslice], (halfBins+j+1)*(DYTools::pTRangeMax-DYTools::pTRangeMin)/DYTools::npTBins[mslice]); 
+               fprintf(txtFile,"%1.1f-%1.1f", (halfBins+j)*(DYTools::XXRangeMax-DYTools::XXRangeMin)/DYTools::nXXBins[mslice], (halfBins+j+1)*(DYTools::XXRangeMax-DYTools::XXRangeMin)/DYTools::nXXBins[mslice]); 
 
                for (int i=0; i<nValues; i++)
                  {
@@ -670,9 +670,9 @@ void latexPrintoutOneColumn2D(const int nValues, int* valuesType, TMatrixD** val
        fprintf(txtFile,"%s",strQuantities.Data());
        fprintf(txtFile,"\\hline\n");
 
-       for (int j=0; j<DYTools::npTBins[mslice]; j++)
+       for (int j=0; j<DYTools::nXXBins[mslice]; j++)
          {
-           fprintf(txtFile,"%1.1f-%1.1f", j*(DYTools::pTRangeMax-DYTools::pTRangeMin)/DYTools::npTBins[mslice], (j+1)*(DYTools::pTRangeMax-DYTools::pTRangeMin)/DYTools::npTBins[mslice]);
+           fprintf(txtFile,"%1.1f-%1.1f", j*(DYTools::XXRangeMax-DYTools::XXRangeMin)/DYTools::nXXBins[mslice], (j+1)*(DYTools::XXRangeMax-DYTools::XXRangeMin)/DYTools::nXXBins[mslice]);
            for (int i=0; i<nValues; i++)
              {
                 TMatrixD& temp0= *values[i];

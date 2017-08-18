@@ -613,7 +613,7 @@ int unfoldFSR(const TMatrixD &vinM, TMatrixD &voutM, const TString &unfoldingCon
     TVectorD mass(nMassBins+1);
     TVectorD rapidityCounts(nMassBins);
     for (int i=0; i<nMassBins+1; i++) mass[i]=massBinLimits[i];
-    for (int i=0; i<nMassBins  ; i++) rapidityCounts[i]=npTBins[i];
+    for (int i=0; i<nMassBins  ; i++) rapidityCounts[i]=nXXBins[i];
     mass.Write("massBinLimits"); // was 'massBinning'
     rapidityCounts.Write("rapidityCounts");
   }
@@ -676,12 +676,12 @@ int unfoldFSR(const TMatrixD &vinM, TMatrixD &voutM, const TString &unfoldingCon
     }
     if (rapidityOk) {
       for (int i=0; i<nMassBins; i++) {
-	if ( npTBins[i] != rapidityCounts[i] ) {
+	if ( nXXBins[i] != rapidityCounts[i] ) {
 	  std::cout << fncname 
 		    << "y bin count " << fileInfo
 		    << " at i=" << i 
 		    << " is " << rapidityCounts[i] 
-		    << " instead of expected " << npTBins[i] << "\n";
+		    << " instead of expected " << nXXBins[i] << "\n";
 	  rapidityOk=false;
 	}
       }
@@ -707,12 +707,12 @@ int unfoldFSR(const TMatrixD &vinM, TMatrixD &voutM, const TString &unfoldingCon
   bool checkRangesMY(const TMatrixD &M, const TString &name, int verb) {
     bool ok=true;
     if (verb) std::cout << "checkRangesMY: check matrix with name=<" << name << ">\n";
-    int nMaxpTBins= DYTools::findMaxpTBins();
+    int nMaxXXBins= DYTools::findMaxXXBins();
     if(( M.GetNrows() != DYTools::nMassBins ) ||
-       ( M.GetNcols() != nMaxpTBins )) {
+       ( M.GetNcols() != nMaxXXBins )) {
       std::cout << "checkRangesMY(TMatrixD): " << name << " is not good: "
 		<< M.GetNrows() << 'x' << M.GetNcols() << " instead of "
-		<< DYTools::nMassBins << 'x' << nMaxpTBins << "\n";
+		<< DYTools::nMassBins << 'x' << nMaxXXBins << "\n";
       ok=false;
     }
     else { if (verb) std::cout << "...ok\n"; }
