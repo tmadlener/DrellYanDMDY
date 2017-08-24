@@ -19,11 +19,11 @@ void createDummyEscaleSystematics(TString lumiTag="DY_j22_19712pb", int saveTexT
   TVectorD escaleFitShapeSystRelative(nUnfoldingBins);
   TVectorD escaleEtaBinSystRelative(nUnfoldingBins);
   TVectorD escaleSystPercent(nUnfoldingBins);
-  escaleRandomizedSystRelative = 0;
-  escaleResidualDiffSystRelative=0;
-  escaleFitShapeSystRelative = 0;
-  escaleEtaBinSystRelative = 0;
-  escaleSystPercent = 0;
+  escaleRandomizedSystRelative = 1e-6; 		//C: Just to see if something changes
+  escaleResidualDiffSystRelative=1e-6; 		//C: Just to see if something changes
+  escaleFitShapeSystRelative = 1e-6; 		//C: Just to see if something changes
+  escaleEtaBinSystRelative = 1e-6; 		//C: Just to see if something changes
+  escaleSystPercent = 1e-6; 			//C: Just to see if something changes
 
   TString finalFName=TString("../root_files/systematics/") + lumiTag + 
     TString("/escale_systematics") + DYTools::analysisTag + TString("_dummy.root");

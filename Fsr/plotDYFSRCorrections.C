@@ -78,8 +78,8 @@ void plotDYFSRCorrections(const TString input, bool sansAcc=0, int debugMode=0)
   else {
   ifstream ifs;
   ifs.open(input.Data());
-  if( !ifs.is_open())
-    assert(0);
+  if ( !ifs.is_open())
+	assert(0);
   string line;
   Int_t state=0;
   while(getline(ifs,line)) {
@@ -227,7 +227,9 @@ void plotDYFSRCorrections(const TString input, bool sansAcc=0, int debugMode=0)
       if((mass < massLow) || (mass > massHigh)) continue;
       double y = gen->vy;    // pre-FSR
       double yPostFsr = gen->y;    // post-FSR
-      if((fabs(y) < DYTools::pTRangeMin) || (fabs(y) > DYTools::pTRangeMax)) continue;
+      double pt = gen->vpt;    // pre-FSR
+      double ptPostFsr = gen->pt;    // post-FSR
+      if((fabs(pt) < DYTools::pTRangeMin) || (fabs(pt) > DYTools::pTRangeMax)) continue;
 
       int ibinM1D = DYTools::_findMassBin2011(mass);      // temporary
       // If mass is larger than the highest bin boundary
@@ -243,8 +245,8 @@ void plotDYFSRCorrections(const TString input, bool sansAcc=0, int debugMode=0)
 	ibinM = DYTools::nMassBins-1;
       int ibinMPostFsr = DYTools::findMassBin(massPostFsr);
 
-      int ibinY = DYTools::findAbspTBin(ibinM,y);
-      int ibinYPostFsr = DYTools::findAbspTBin(ibinMPostFsr,yPostFsr);
+      int ibinpT = DYTools::findAbspTBin(ibinM,pt);
+      int ibinpTPostFsr = DYTools::findAbspTBin(ibinMPostFsr,ptPostFsr);
 
       // Find FEWZ-powheg reweighting factor 
       // that depends on pre-FSR Z/gamma* rapidity and pt
@@ -275,28 +277,28 @@ void plotDYFSRCorrections(const TString input, bool sansAcc=0, int debugMode=0)
      //       printf("mass= %f   pt= %f    Y= %f     weight= %f\n",gen->mass, gen->vpt, gen->vy, fewz_weight);
       }
 
-      if(ibinM != -1 && ibinM<DYTools::nMassBins && ibinY!=-1 && ibinY<DYTools::npTBins[ibinM]) {
-	//std::cout << "presel: ientry=" << ientry << ", ibinM=" << ibinM << ", ibinY=" << ibinY << ", weight=" << (scale * gen->weight * fewz_weight) << "\n";
-	nEventsv(ibinM,ibinY) += scale * gen->weight * fewz_weight;
+      if(ibinM != -1 && ibinM<DYTools::nMassBins && ibinpT!=-1 && ibinpT<DYTools::npTBins[ibinM]) {
+	//std::cout << "presel: ientry=" << ientry << ", ibinM=" << ibinM << ", ibinpT=" << ibinpT << ", weight=" << (scale * gen->weight * fewz_weight) << "\n";
+	nEventsv(ibinM,ibinpT) += scale * gen->weight * fewz_weight;
       }
-      else if(ibinM >= DYTools::nMassBins || ibinY>=DYTools::npTBins[ibinM])
+      else if(ibinM >= DYTools::nMassBins || ibinpT>=DYTools::npTBins[ibinM])
         binProblemPreFsr++;
 
-      if(ibinMPostFsr!=-1 && ibinMPostFsr<DYTools::nMassBins &&  ibinYPostFsr!=-1 
-	 && ibinYPostFsr<DYTools::npTBins[ibinMPostFsr])
-	nPassv(ibinMPostFsr,ibinYPostFsr) += scale * gen->weight * fewz_weight;
+      if(ibinMPostFsr!=-1 && ibinMPostFsr<DYTools::nMassBins &&  ibinpTPostFsr!=-1 
+	 && ibinpTPostFsr<DYTools::npTBins[ibinMPostFsr])
+	nPassv(ibinMPostFsr,ibinpTPostFsr) += scale * gen->weight * fewz_weight;
       else if(ibinMPostFsr >= DYTools::nMassBins || 
-	      ibinYPostFsr>=DYTools::npTBins[ibinMPostFsr]) {
+	      ibinpTPostFsr>=DYTools::npTBins[ibinMPostFsr]) {
 	// Do nothing: post-fsr mass could easily be below the lowest edge of mass range
         binProblemPostFsr++;
       }
 
-      if (ibinM==ibinMPostFsr && ibinY==ibinYPostFsr)
+      if (ibinM==ibinMPostFsr && ibinpT==ibinpTPostFsr)
         {
-          if(ibinM != -1 && ibinM<DYTools::nMassBins && ibinY!=-1 && 
-	     ibinY<DYTools::npTBins[ibinM])
-            nCorrelv(ibinM,ibinY) += scale * gen->weight * fewz_weight;
-          else if(ibinM >= DYTools::nMassBins || ibinY>=DYTools::npTBins[ibinM])
+          if(ibinM != -1 && ibinM<DYTools::nMassBins && ibinpT!=-1 && 
+	     ibinpT<DYTools::npTBins[ibinM])
+            nCorrelv(ibinM,ibinpT) += scale * gen->weight * fewz_weight;
+          else if(ibinM >= DYTools::nMassBins || ibinpT>=DYTools::npTBins[ibinM])
             binProblemCorrel++;
         }
 

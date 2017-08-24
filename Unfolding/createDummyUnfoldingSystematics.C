@@ -55,17 +55,17 @@ void createDummyUnfoldingSystematics(const TString conf){
   TVectorD unfoldedYieldsRMS(nUnfoldingBins);
   TVectorD unfoldedYieldsSquaredMean(nUnfoldingBins);
   
-  unfoldedYieldsMean = 0;
-  unfoldedYieldsRMS = 0;
-  unfoldedYieldsSquaredMean = 0;
+  unfoldedYieldsMean = 1e-6; 		//C: Just to see if something changes
+  unfoldedYieldsRMS = 1e-6; 		//C: Just to see if something changes
+  unfoldedYieldsSquaredMean = 1e-6; 	//C: Just to see if something changes
 
   TVectorD unfoldingSystPercentSmear(nUnfoldingBins);
   TVectorD unfoldingSystPercentFsr(nUnfoldingBins); 
   TVectorD unfoldingSystPercent(nUnfoldingBins); 
 
-  unfoldingSystPercentSmear = 0;
-  unfoldingSystPercentFsr = 0;
-  unfoldingSystPercent = 0;
+  unfoldingSystPercentSmear = 1e-6; 		//C: Just to see if something changes
+  unfoldingSystPercentFsr = 1e-6; 		//C: Just to see if something changes
+  unfoldingSystPercent = 1e-6; 			//C: Just to see if something changes
 
   // Store constants in the file
   TString outputDir(TString("../root_files/systematics/")+tagDirConstants);

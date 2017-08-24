@@ -56,9 +56,9 @@ void createDummyAcceptanceSystematics(const TString conf){
   TMatrixD accFsrMax(DYTools::nMassBins,DYTools::npTBinsMax);
   TMatrixD accFsrMin(DYTools::nMassBins,DYTools::npTBinsMax);
   TMatrixD accSystPercentFsr(DYTools::nMassBins,DYTools::npTBinsMax);
-  accFsrMax = 0;
-  accFsrMin = 0;
-  accSystPercentFsr = 0;
+  accFsrMax = 1e-6; 		//C: Just to see if something changes
+  accFsrMin = 1e-6;		//C: Just to see if something changes
+  accSystPercentFsr = 1e-6;	//C: Just to see if something changes
 
   // Store constants in the file
   TString fileEnd(DYTools::analysisTag + TString("_dummy.root"));
