@@ -65,13 +65,13 @@ do_escaleSystematics=0  # Can be skipped, very long calculation! but see dummy s
 do_acceptance=0         # Necessary for simplest x-sec
 do_acceptanceSyst=0     # Can be skipped, see below about dummy systematics
 do_efficiency=0         # Necessary for simplest x-sec
-do_efficiencyScaleFactors=0 # Necessary for simplest x-sec, LONG, check EventScaleFactors/*sh script settings! ; There is also files in root_files/constants
+do_efficiencyScaleFactors=1 # Necessary for simplest x-sec, LONG, check EventScaleFactors/*sh script settings! ; There is also files in root_files/constants
 do_plotFSRCorrections=0 # Necessary for simplest x-secpt
 
 do_plotFSRCorrectionsSansAcc=0 # Necessary for simplest x-sec
 do_setupTheory=0        # Necessary for simplest x-sec
 do_crossSectionFsr=0    # Necessary for simplest x-sec
-do_plotXSec=1           # Necessary for simplest x-sec
+do_plotXSec=0           # Necessary for simplest x-sec
 
 
 # Dummy systematics. When one wishes to not spend time O(day) to compute

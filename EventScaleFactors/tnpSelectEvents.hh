@@ -82,16 +82,16 @@ struct esfSelectEvent_t
 {
 public:
 
-  Double_t genMass,genY,mass,y;
+  Double_t genMass,genY,genPt,mass,y,pt;
   Double_t et_1,eta_1,et_2,eta_2;
   Double_t weight;
   UInt_t nGoodPV;
 
-  void assign(double _genMass, double _genY,
+  void assign(double _genMass, double _genY, double _genPt,
 	      double _mass, double _y1, 
 	      double _et1, double _eta1,
 	      double _et2, double _eta2, double _weight, UInt_t _nGoodPV) {
-    genMass=_genMass; genY=_genY;
+    genMass=_genMass; genY=_genY; genPt=_genPt;
     mass=_mass; y=_y1;
     et_1=_et1; eta_1=_eta1;
     et_2=_et2; eta_2=_eta2;
@@ -102,8 +102,10 @@ public:
   void createBranches(TTree *tree) {
     tree->Branch("genMass",&this->genMass,"genMass/D");
     tree->Branch("genY",&this->genY,"genY/D");
+    tree->Branch("genPt",&this->genPt,"genPt/D");
     tree->Branch("mass",&this->mass,"mass/D");
     tree->Branch("y",&this->y,"y/D");
+    tree->Branch("pt",&this->pt,"pt/D");
     tree->Branch("et_1",&this->et_1,"et_1/D");
     tree->Branch("eta_1",&this->eta_1,"eta_1/D");
     tree->Branch("et_2",&this->et_2,"et_2/D");
@@ -115,8 +117,10 @@ public:
   void setBranchAddress(TTree *tree) {
     tree->SetBranchAddress("genMass",&this->genMass);
     tree->SetBranchAddress("genY",&this->genY);
+    tree->SetBranchAddress("genPt",&this->genPt);
     tree->SetBranchAddress("mass",&this->mass);
     tree->SetBranchAddress("y",&this->y);
+    tree->SetBranchAddress("pt",&this->pt);
     tree->SetBranchAddress("et_1",&this->et_1);
     tree->SetBranchAddress("eta_1",&this->eta_1);
     tree->SetBranchAddress("et_2",&this->et_2);
@@ -130,7 +134,7 @@ public:
   }
 
 #ifdef esfSelectEventsIsObject
-  ClassDef(esfSelectEvent_t,1)
+  ClassDef(esfSelectEvent_t,2)
 #endif
 };
 

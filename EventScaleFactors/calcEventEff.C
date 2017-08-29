@@ -322,6 +322,7 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
   hScaleRecoFIV.reserve(nUnfoldingBins);
   hScaleIdFIV.reserve(nUnfoldingBins);
   hScaleHltFIV.reserve(nUnfoldingBins);
+  cout << "I am reserve the hScaleFIV" << endl;
 
   for(int i=0; i<DYTools::nMassBins; i++){
     double *pTBinLimits=DYTools::getpTBinLimits(i);
@@ -359,8 +360,14 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
 				     base+TString("_id" ),150,0.0,1.5));
       hScaleHltFIV.push_back(new TH1F(base+TString("_hlt"),
 				      base+TString("_hlt"),150,0.0,1.5));
+      cout << "I am doing the first filling of hScaleFIV" << endl;
     }
     delete pTBinLimits;
+  }
+  cout << "\n\nI will try to see hScaleFIV after it is push_back" << endl;
+  for (size_t i = 0; i < hScaleFIV.size(); ++i){
+	const double nEntries = hScaleFIV[i]->GetEntries();
+	std::cout << i << " " << nEntries << "\n";
   }
 
   // Create Gaussian-distributed random offsets for each pseudo-experiment
@@ -542,7 +549,7 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
     hScaleHlt->Fill( scaleFactorHlt, weight);
     // Use generator-level post-FSR mass, y
     int ibin= DYTools::findMassBin(selData.genMass);
-    int idx = DYTools::findIndexFlat(selData.genMass,selData.genY);
+    int idx = DYTools::findIndexFlat(selData.genMass,selData.genPt); //C: genY->genPT
     if ((ibin>=0) && (ibin<DYTools::nMassBins)) {
       hLeadingEtV [ibin]->Fill( selData.et_1, weight);
       hTrailingEtV[ibin]->Fill( selData.et_2, weight);
@@ -561,6 +568,12 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
       hScaleIdV [ibin]->Fill( scaleFactorId, weight);
       hScaleHltV[ibin]->Fill( scaleFactorHlt, weight);
       hScaleV   [ibin]->Fill( scaleFactor, weight);
+      /*cout << "\n\nI will try to see hScaleV after it is filled [other]" << endl;
+      for (size_t i = 0; i < hScaleFIV.size(); ++i){
+	const double nEntries = hScaleV[i]->GetEntries();
+	std::cout << i << " " << nEntries << "\n";*/
+
+      std::cout << "idx = " << idx << "\t" << "nUnfoldingBins = " << nUnfoldingBins <<"\n";
       if ((idx>=0) && (idx<nUnfoldingBins)) {
 	hScaleRecoFIV[idx]->Fill( scaleFactorReco, weight);
 	hScaleIdFIV [idx]->Fill( scaleFactorId, weight);
@@ -568,8 +581,14 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
 	hScaleFIV   [idx]->Fill( scaleFactor, weight);
 	hEvtW->Fill(idx,weight);
 	hEsfEvtW->Fill(idx,scaleFactor*weight);
+        cout << "I am filling the hScaleFIV" << endl;
+	cout << "\n\nI will try to see hScaleFIV after it is filled" << endl;
+  	for (size_t i = 0; i < hScaleFIV.size(); ++i){
+		const double nEntries = hScaleFIV[i]->GetEntries();
+		std::cout << i << " " << nEntries << "\n";
+  	}
       }
-	
+      
       // Acumulate pseudo-experiments for error estimate
       for(int iexp = 0; iexp<nexp; iexp++){
 	scaleFactor = findEventScaleFactorSmeared(selData, iexp);
@@ -669,6 +688,7 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
     scaleIdFIV [idx] = hScaleIdFIV [idx] ->GetMean();
     scaleHltFIV[idx] = hScaleHltFIV[idx]->GetMean();
     scaleFIV   [idx] = hScaleFIV   [idx]->GetMean();
+    cout << "I am filling the scaleFIV with the hScaleFIV" << idx;
   }
 
   /* superceded
@@ -780,10 +800,15 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
   TVectorD vecEtaBins(etaBinCount+1);
   for (int i=0; i<etaBinCount+1; ++i) vecEtaBins[i]=etaBinLimits[i];
 
+  cout << "I am here" << endl;
   TFile fa(sfConstFileName, "recreate");
   scaleV.Write("scaleFactorMassIdxArray");
   scaleMeanErrV.Write("scaleFactorErrMassIdxArray");
+  scaleFIV.Print();
+  cout << "\n";
   scaleFIV.Write("scaleFactorFlatIdxArray");
+  scaleFIV.Print();
+  cout << "\n\n";
   scaleMeanErrFIV.Write("scaleFactorErrFlatIdxArray");
   scaleMatrix.Write("scaleFactor");
   scaleMatrixErr.Write("scaleFactorErr");
@@ -973,6 +998,7 @@ void calcEventEff(const TString mcInputFile, const TString tnpDataInputFile,
 	       hScaleIdFIV[idx]->GetMean(),  scaleMeanIdErrFIV[idx],
 	       hScaleHltFIV[idx]->GetMean(), scaleMeanHltErrFIV[idx],
 	       hScaleFIV[idx]->GetMean()   , scaleMeanErrFIV[idx]);
+	       cout << "I am printing the table" << endl;
       }
     }
   }
@@ -1289,8 +1315,8 @@ int createSelectionFile(const MCInputFileMgr_t &mcMgr,
 
 	double weight=sample_weight;
 	if (useFewzWeights) weight *= fewz.getWeight(gen->vmass,gen->vpt,gen->vy);
-	selData.assign(gen->mass, gen->y,
-		       dielectron->mass, dielectron->y, 				//C: Do I need to change this?
+	selData.assign(gen->mass, gen->y, gen->pt,
+		       dielectron->mass, dielectron->y, 				//C: Do I need to change this? Apparently, yes :P
 		       leading->scEt, leading->scEta,
 		       trailing->scEt, trailing->scEta,
 		       weight,
